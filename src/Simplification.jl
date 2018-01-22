@@ -1,21 +1,12 @@
-module Simplification
-
-export expand_expression
-
-push!(LOAD_PATH, "/Users/mason/Documents/Julia/JuliaMath")
-using Symbolic_Dispatch
-using MacroTools
-using Lazy
-
-
 ex = Union{Sym, Expr}
+
 
 function expand_expression(expr::Expr)
     MacroTools.postwalk(x -> expand_term(x), expr)
 end
 expand_expression(a::Union{Number, Sym}) = a
 
-function expansion_loop(expr::Expr)
+function simplification_loop(expr::Expr)
     out1 = walk_expand_unravel(expr)
     out2 = walk_expand_unravel(out1)
     while out2 != out1
@@ -24,6 +15,8 @@ function expansion_loop(expr::Expr)
     end
     out2
 end
+
+simplification_loop(a::Union{Number, Sym}) = a
 
 
 function walk_expand_unravel(expr::Expr)
@@ -68,7 +61,7 @@ unravel_brackets(a::Union{Number, Sym}) = a
 function expand_term(expr::Expr)
     expr |> apply_algebraic_rules
 end
-expand_term(a::Union{Sym,Number}) = a
+expand_term(a::Union{Sym,Number, Symbol}) = a
 expand_term
 
 
@@ -108,6 +101,7 @@ function pos_x_equals_x(expr::ex)
     end
     expr
 end
+
 pos_x_equals_x(num::Number) = num
 
 function find_first_duplicates(a::Array)
@@ -233,66 +227,3 @@ function is_all_numbers(list::Array)
     end
     true
 end
-
-
-
-
-end
-
-
-#
-#
-# function apply_differentiation_rules(expr::Expr)
-#     expr |> distribute_D_over_addition |> power_rule |> product_rule |> D_of_exponential |> D_of_log |> D_of_constant |> D_symbol
-# end
-#
-# apply_differentiation_rules(num::Number) = num
-# apply_differentiation_rules(sym::Symbol) = sym
-#
-
-
-
-# function distribute_D_over_addition(expr::Expr)
-#     if (expr.args[1] == :D) && (typeof(expr.args[2]) == Expr) && ((expr.args[2]).args[1] == :+)
-#         expr = +([:(D($x)) for x in (expr.args[2]).args[2:end]]...)
-#     end
-#     expr
-# end
-#
-# function power_rule(expr::Expr)
-#     @capture(expr, D((x_Symbol)^n_Number)) && (expr = :($n * $x^($n + -1) * D($x)))
-#     expr
-# end
-#
-# function product_rule(expr::Expr)
-#     @capture(expr, D(x_*y_)) && (expr = :(D($x) * $y + $x * D($y)))
-#     expr
-# end
-#
-#
-# function D_of_exponential(expr::Expr)
-#     @capture(expr, D(a_Number^b_)) && (expr = :($(log(a)) * $a^$b * D($b)))
-#     @capture(expr, D(e^b_)) && (expr = :(e^$b * D($b)))
-#     expr
-# end
-#
-# function D_of_log(expr::Expr)
-#     @capture(expr, D(log(a_))) && (expr = :(D($a)/$a))
-#     expr
-# end
-#
-#
-# function D_symbol(expr::Expr)
-#     @capture(expr, D(a_Symbol)) && (expr = 1)
-#     expr
-# end
-#
-# D_symbol(sym::Symbol) = sym
-# D_symbol(num::Number) = num
-#
-# function D_of_constant(expr::Expr)
-#     @capture(expr, D(a_Number)) && (expr = 0)
-#     expr
-# end
-#
-# D_of_constant(num::Number) = num

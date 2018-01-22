@@ -1,4 +1,3 @@
-module types
 
 struct Sym
     name::Symbol
@@ -48,19 +47,13 @@ function Base.show(io::IO, dual::Dual_Number)
     real_string = dual.real == 0 ? "" : "$(dual.real) $op "
     infinitesimal_string = dual.infinitesimal == 0 ? "" :
                            (dual.infinitesimal isa Number)&&(abs(dual.infinitesimal) == 1) ? "ϵ" :
-                           (dual.infinitesimal isa Expr) && (dual.infinitesimal.args[1] == :+ || dual.infinitesimal.args[1] == :-) ? "($(dual.infinitesimal))ϵ" :
-                           "$(dual.infinitesimal)ϵ"
+                           (dual.infinitesimal isa Expr) && (dual.infinitesimal.args[1] == :+ || dual.infinitesimal.args[1] == :-) ?
+                               "($(dual.infinitesimal))ϵ" :
+                               "$(dual.infinitesimal)ϵ"
     print(io, "$real_string$infinitesimal_string")
 end
-
 
 
 struct Dtype <: Operator end
 const D = Dtype()
 const ∂ = Dtype()
-
-
-
-
-export Sym, @syms, Operator, LiteralFunction, Dual_Number, Dtype, D, ∂, UpTuple
-end

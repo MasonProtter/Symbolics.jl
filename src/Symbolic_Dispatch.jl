@@ -1,12 +1,3 @@
-module Symbolic_Dispatch
-
-push!(LOAD_PATH, "/Users/mason/Documents/Julia/JuliaMath")
-using MacroTools
-using ForwardDiff
-using types
-
-# using MacroTools: prewalk, postwalk
-
 import Base.+
 import Base.-
 import Base.*
@@ -223,9 +214,3 @@ log(a::ex) = :(log($a))
 # Trig
 sin(x::ex) = :(sin($x))
 cos(x::ex) = :(cos($x))
-
-export ex, +, -, *, ^, /, log, sin, cos, dot, zero, Sym, @syms
-
-
-
-end

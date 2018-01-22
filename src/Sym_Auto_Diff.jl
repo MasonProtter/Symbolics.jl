@@ -1,5 +1,3 @@
-module Sym_Auto_Diff
-
 import Base.show
 import Base.conj
 import Base.+
@@ -13,23 +11,10 @@ import Base.cos
 import Base.dot
 import Base.zero
 
-export +, -, *, /, *, ^, log, sin, cos, dot, zero, dual_number, Dual_Number, LiteralFunction, infinitesimal, ϵ, square, conj, D, ∂, up, expand_term
-
-# import Base.
 
 
 
-push!(LOAD_PATH, "/Users/mason/Documents/Julia/JuliaMath")
-using types
-using Symbolic_Dispatch
-using Simplification
-using Revise
-using UpDownTuples
-import UpDownTuples.square
-import Simplification.expand_term
-
-
-Mathy = Union{Number, Sym, Expr}
+Mathy = Union{Number, Sym, Expr, Symbol}
 
 
 (f::LiteralFunction)(t) = :($(f.name)($t))
@@ -105,11 +90,11 @@ cos(a::Dual_Number) = dual_number(cos(a.real), -sin(a.real)*a.infinitesimal)
 
 function D(f::Function)
     Df(t::Number) = ForwardDiff.derivative(f, t)
-    Df(t::ex) = infinitesimal(f(t + ϵ) ) |> expand_expression
+    Df(t::ex) = infinitesimal(f(t + ϵ) ) |> simplification_loop
     function Df(t::Dual_Number)
-        real_part = D(f)(t.real) |> expand_expression
-        df = eval(Expr(:function, Expr(:call, gensym(), :t), :($(D(f)(:t)))))
-        diff_part = infinitesimal(Base.invokelatest(df, t)) |> expand_expression
+        real_part = D(f)(t.real) |> simplification_loop
+        df = eval(Expr(:function, Expr(:call, gensym(), :t), :($(D(f)(Sym(:t))))))
+        diff_part = infinitesimal(Base.invokelatest(df, t)) |> simplification_loop
         dual_number(real_part, diff_part)
     end
 end
@@ -131,43 +116,4 @@ function ∂(f::Function, index::Integer)
         end
         D(partial_f)(arr[index])
     end
-end
-#
-#
-# m = Sym(:m)
-# k = Sym(:k)
-# x = LiteralFunction(Sym(:x))
-#
-# function L(local_tuple)
-#     t, q, qdot = local_tuple
-#     1/2*m*square(qdot) + 1/2*k*square(q)
-# end
-#
-# # x = LiteralFunction(:x)
-#
-# function Γ(w)
-#     local_tuple(t) = up(t, w(t), D(w)(t))
-# end
-#
-# function Lagrange_Equations(L)
-#     w ->  D((∂(L,3)∘(Γ(w)))) - ∂(L,2)∘Γ(w)
-# end
-#
-#
-#
-#
-# (∂(L,2)∘Γ(x))(:t) |> expand_expression
-#
-# Simplification.expand_term(m)
-#
-#
-#
-#
-# D(∂(L,3)∘(Γ(x)))(:t)
-#
-#
-# Lagrange_Equations(L)(x)(:t)
-
-
-
 end

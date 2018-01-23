@@ -13,17 +13,13 @@ import Base.zero
 
 
 
-
-Mathy = Union{Number, Sym, Expr, Symbol}
-
-
 (f::LiteralFunction)(t) = :($(f.name)($t))
 
 
 infinitesimal(a::Dual_Number) = a.infinitesimal
 infinitesimal(a::Dual_Number, tag::Integer) =
 infinitesimal(a::UpTuple) = up(infinitesimal(i) for i in a.data)
-infinitesimal(a::Union{Number, Sym, Expr}) = 0
+infinitesimal(a::Union{Number, Sym, SymExpr}) = 0
 
 tag_counter = 0
 function iterate_tag()
@@ -42,7 +38,7 @@ dual_number(a) = dual_number(0, a)
 
 
 (f::LiteralFunction)(t::Dual_Number) = begin
-    dual_number(:($(f.name)($(t.real))) |> expand_expression,  :(D($(f.name))($(t.real)))|> expand_expression)
+    dual_number(SymExpr(:($(f.name)($(t.real)))) |> expand_expression,  SymExpr(:(D($(f.name))($(t.real))))|> expand_expression)
 end
 
 

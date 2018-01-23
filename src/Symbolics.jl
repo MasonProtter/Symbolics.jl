@@ -1,26 +1,16 @@
-push!(LOAD_PATH, "/Users/mason/Documents/Julia/Symbolics.jl/src/");
+module Symbolics
+
 using MacroTools
 using Lazy
 using Revise
 using ForwardDiff
 
 include("types.jl")
-include("types.jl")
 include("UpDownTuples.jl")
 include("Symbolic_Dispatch.jl")
 include("Simplification.jl")
 include("Sym_Auto_Diff.jl")
 
-# edit("src/Simplification.jl")
+export D, ∂, simplification_loop, Sym, @syms, LiteralFunction, UpTuple
 
-
-@syms x y z
-
-f(x) = x^3
-
-D(f)(x + ϵ)
-
-
-
-
-
+end

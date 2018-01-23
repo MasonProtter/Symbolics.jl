@@ -1,9 +1,28 @@
+using AutoHashEquals
 
 struct Sym
     name::Symbol
 end
 
-Mathy = Union{Number, Sym, Expr}
+@auto_hash_equals struct SymExpr
+    expr::Union{Expr, SymExpr}
+    head::Symbol
+    args::Array
+end
+
+SymExpr(head::Symbol, args...) = SymExpr(Expr(head, args...))
+SymExpr(expr::Expr) = SymExpr(expr, expr.head, expr.args)
+SymExpr(expr::SymExpr) = SymExpr(expr.expr, expr.head, expr.args)
+
+function Base.show(io::IO, symexpr::SymExpr)
+    print(io, symexpr.expr)
+end
+
+Base.eval(a::SymExpr) = eval(a.expr)
+
+
+Mathy = Union{Number, Sym, SymExpr}
+ex = Union{Sym, SymExpr}
 
 function Base.show(io::IO, symbol::Sym)
     print(io, symbol.name)
@@ -11,11 +30,14 @@ end
 
 
 macro syms(names...)
+    out = Expr(:block)
     for name in names
         v = Sym(name)
-        eval(:($name = $v))
+        push!(out.args, Expr(:(=), name, v))
     end
+   esc(out)
 end
+
 
 abstract type Operator <: Function end
 

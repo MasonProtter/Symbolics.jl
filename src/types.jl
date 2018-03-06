@@ -14,8 +14,15 @@ SymExpr(head::Symbol, args...) = SymExpr(Expr(head, args...))
 SymExpr(expr::Expr) = SymExpr(expr, expr.head, expr.args)
 SymExpr(expr::SymExpr) = SymExpr(expr.expr, expr.head, expr.args)
 
+
+function to_Expr(a::SymExpr)
+    Expr(a.head, [i isa SymExpr ? to_Expr(i) :
+                  i isa Sym ? i.name :
+                  i for i in a.args]...)
+end
+
 function Base.show(io::IO, symexpr::SymExpr)
-    print(io, symexpr.expr)
+    show(to_Expr(symexpr))
 end
 
 Base.eval(a::SymExpr) = eval(a.expr)

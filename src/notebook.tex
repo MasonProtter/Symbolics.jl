@@ -1,0 +1,824 @@
+
+% Default to the notebook output style
+
+    
+
+
+% Inherit from the specified cell style.
+
+
+
+
+    
+\documentclass[11pt]{article}
+
+    
+    
+    \usepackage[T1]{fontenc}
+    % Nicer default font (+ math font) than Computer Modern for most use cases
+    \usepackage{mathpazo}
+
+    % Basic figure setup, for now with no caption control since it's done
+    % automatically by Pandoc (which extracts ![](path) syntax from Markdown).
+    \usepackage{graphicx}
+    % We will generate all images so they have a width \maxwidth. This means
+    % that they will get their normal width if they fit onto the page, but
+    % are scaled down if they would overflow the margins.
+    \makeatletter
+    \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth
+    \else\Gin@nat@width\fi}
+    \makeatother
+    \let\Oldincludegraphics\includegraphics
+    % Set max figure width to be 80% of text width, for now hardcoded.
+    \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=.8\maxwidth]{#1}}
+    % Ensure that by default, figures have no caption (until we provide a
+    % proper Figure object with a Caption API and a way to capture that
+    % in the conversion process - todo).
+    \usepackage{caption}
+    \DeclareCaptionLabelFormat{nolabel}{}
+    \captionsetup{labelformat=nolabel}
+
+    \usepackage{adjustbox} % Used to constrain images to a maximum size 
+    \usepackage{xcolor} % Allow colors to be defined
+    \usepackage{enumerate} % Needed for markdown enumerations to work
+    \usepackage{geometry} % Used to adjust the document margins
+    \usepackage{amsmath} % Equations
+    \usepackage{amssymb} % Equations
+    \usepackage{textcomp} % defines textquotesingle
+    % Hack from http://tex.stackexchange.com/a/47451/13684:
+    \AtBeginDocument{%
+        \def\PYZsq{\textquotesingle}% Upright quotes in Pygmentized code
+    }
+    \usepackage{upquote} % Upright quotes for verbatim code
+    \usepackage{eurosym} % defines \euro
+    \usepackage[mathletters]{ucs} % Extended unicode (utf-8) support
+    \usepackage[utf8x]{inputenc} % Allow utf-8 characters in the tex document
+    \usepackage{fancyvrb} % verbatim replacement that allows latex
+    \usepackage{grffile} % extends the file name processing of package graphics 
+                         % to support a larger range 
+    % The hyperref package gives us a pdf with properly built
+    % internal navigation ('pdf bookmarks' for the table of contents,
+    % internal cross-reference links, web links for URLs, etc.)
+    \usepackage{hyperref}
+    \usepackage{longtable} % longtable support required by pandoc >1.10
+    \usepackage{booktabs}  % table support for pandoc > 1.12.2
+    \usepackage[inline]{enumitem} % IRkernel/repr support (it uses the enumerate* environment)
+    \usepackage[normalem]{ulem} % ulem is needed to support strikethroughs (\sout)
+                                % normalem makes italics be italics, not underlines
+    
+
+    
+    
+    % Colors for the hyperref package
+    \definecolor{urlcolor}{rgb}{0,.145,.698}
+    \definecolor{linkcolor}{rgb}{.71,0.21,0.01}
+    \definecolor{citecolor}{rgb}{.12,.54,.11}
+
+    % ANSI colors
+    \definecolor{ansi-black}{HTML}{3E424D}
+    \definecolor{ansi-black-intense}{HTML}{282C36}
+    \definecolor{ansi-red}{HTML}{E75C58}
+    \definecolor{ansi-red-intense}{HTML}{B22B31}
+    \definecolor{ansi-green}{HTML}{00A250}
+    \definecolor{ansi-green-intense}{HTML}{007427}
+    \definecolor{ansi-yellow}{HTML}{DDB62B}
+    \definecolor{ansi-yellow-intense}{HTML}{B27D12}
+    \definecolor{ansi-blue}{HTML}{208FFB}
+    \definecolor{ansi-blue-intense}{HTML}{0065CA}
+    \definecolor{ansi-magenta}{HTML}{D160C4}
+    \definecolor{ansi-magenta-intense}{HTML}{A03196}
+    \definecolor{ansi-cyan}{HTML}{60C6C8}
+    \definecolor{ansi-cyan-intense}{HTML}{258F8F}
+    \definecolor{ansi-white}{HTML}{C5C1B4}
+    \definecolor{ansi-white-intense}{HTML}{A1A6B2}
+
+    % commands and environments needed by pandoc snippets
+    % extracted from the output of `pandoc -s`
+    \providecommand{\tightlist}{%
+      \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+    % Add ',fontsize=\small' for more characters per line
+    \newenvironment{Shaded}{}{}
+    \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
+    \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
+    \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{{#1}}}
+    \newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{{#1}}}
+    \newcommand{\RegionMarkerTok}[1]{{#1}}
+    \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\NormalTok}[1]{{#1}}
+    
+    % Additional commands for more recent versions of Pandoc
+    \newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{{#1}}}
+    \newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{{#1}}}
+    \newcommand{\ImportTok}[1]{{#1}}
+    \newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{{#1}}}}
+    \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{{#1}}}
+    \newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{{#1}}}
+    \newcommand{\BuiltInTok}[1]{{#1}}
+    \newcommand{\ExtensionTok}[1]{{#1}}
+    \newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{{#1}}}
+    \newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{{#1}}}
+    \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    
+    
+    % Define a nice break command that doesn't care if a line doesn't already
+    % exist.
+    \def\br{\hspace*{\fill} \\* }
+    % Math Jax compatability definitions
+    \def\gt{>}
+    \def\lt{<}
+    % Document parameters
+    \title{Symbolics}
+    
+    
+    
+
+    % Pygments definitions
+    
+\makeatletter
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+\expandafter\def\csname PY@tok@w\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.73,0.73}{##1}}}
+\expandafter\def\csname PY@tok@c\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@cp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.74,0.48,0.00}{##1}}}
+\expandafter\def\csname PY@tok@k\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@kp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@kt\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\expandafter\def\csname PY@tok@o\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@ow\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\expandafter\def\csname PY@tok@nb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nf\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@nc\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@nn\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@ne\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.82,0.25,0.23}{##1}}}
+\expandafter\def\csname PY@tok@nv\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@no\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nl\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.63,0.63,0.00}{##1}}}
+\expandafter\def\csname PY@tok@ni\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.60,0.60,0.60}{##1}}}
+\expandafter\def\csname PY@tok@na\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.49,0.56,0.16}{##1}}}
+\expandafter\def\csname PY@tok@nt\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nd\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\expandafter\def\csname PY@tok@s\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sd\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@si\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.53}{##1}}}
+\expandafter\def\csname PY@tok@se\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sr\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.53}{##1}}}
+\expandafter\def\csname PY@tok@ss\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@sx\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@m\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@gh\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@gu\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@gd\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.63,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.63,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gr\endcsname{\def\PY@tc##1{\textcolor[rgb]{1.00,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@ge\endcsname{\let\PY@it=\textit}
+\expandafter\def\csname PY@tok@gs\endcsname{\let\PY@bf=\textbf}
+\expandafter\def\csname PY@tok@gp\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@go\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.53,0.53,0.53}{##1}}}
+\expandafter\def\csname PY@tok@gt\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.27,0.87}{##1}}}
+\expandafter\def\csname PY@tok@err\endcsname{\def\PY@bc##1{\setlength{\fboxsep}{0pt}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}
+\expandafter\def\csname PY@tok@kc\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@kd\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@kn\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@kr\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@bp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@fm\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@vc\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@vg\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@vi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@vm\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@sa\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sc\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@dl\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@s2\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sh\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@s1\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@mb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@mf\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@mh\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@mi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@il\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@mo\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@ch\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@cm\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@cpf\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@c1\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@cs\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZam{\char`\&}
+\def\PYZlt{\char`\<}
+\def\PYZgt{\char`\>}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZhy{\char`\-}
+\def\PYZsq{\char`\'}
+\def\PYZdq{\char`\"}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+\makeatother
+
+
+    % Exact colors from NB
+    \definecolor{incolor}{rgb}{0.0, 0.0, 0.5}
+    \definecolor{outcolor}{rgb}{0.545, 0.0, 0.0}
+
+
+
+    
+    % Prevent overflowing lines due to hard-to-break entities
+    \sloppy 
+    % Setup hyperref package
+    \hypersetup{
+      breaklinks=true,  % so long urls are correctly broken across lines
+      colorlinks=true,
+      urlcolor=urlcolor,
+      linkcolor=linkcolor,
+      citecolor=citecolor,
+      }
+    % Slightly bigger margins than the latex defaults
+    
+    \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+    
+    
+
+    \begin{document}
+    
+    
+    \maketitle
+    
+    
+
+    
+    \hypertarget{nauxefve-symbolic-automatic-differentiation-in-julia}{%
+\section{Naïve Symbolic Automatic Differentiation in
+Julia}\label{nauxefve-symbolic-automatic-differentiation-in-julia}}
+
+In this document I'll show a quick naïve way of implementing a very
+basic computer algebra system in Julia which can do symbolic derivatives
+using automatic differentiation. I'll assume a basic knowldege of
+working with Julia expressions.
+
+Before we discuss derivatives, lets quickly build a way to do some basic
+symbolic math.
+
+First off, we need a data type for symbols and symbolic expressions. The
+easiest choice is to use the built in \texttt{Symbol} and \texttt{Expr}
+types, but if we were to to turn this code into a package people would
+yell that defining new methods on functions from \texttt{Base} on types
+from \texttt{Base} is heresy.
+
+Nonetheless, I don't feel like building my own versions of
+\texttt{Symbol} and \texttt{Expr} right now so I'll just make aliases
+for those types called \texttt{Sym} and \texttt{SymExpr} and make all my
+methods in terms of those so that later if I want to avoid type heresy,
+I just have to change the definitions of \texttt{Sym} and
+\texttt{SymExpr} and don't have to worry about all the methods I define.
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}1}]:} \PY{n}{Sym} \PY{o}{=} \PY{k+kt}{Symbol}
+        \PY{n}{SymExpr} \PY{o}{=} \PY{k+kt}{Expr}
+        
+        \PY{n}{symExpr}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{=} \PY{n}{x}
+        \PY{n}{mathy} \PY{o}{=} \PY{k+kt}{Union}\PY{p}{\PYZob{}}\PY{n}{Sym}\PY{p}{,}\PY{n}{SymExpr}\PY{p}{,}\PY{k+kt}{Number}\PY{p}{\PYZcb{}}\PY{p}{;}
+\end{Verbatim}
+
+
+    Okay, now we have \texttt{mathy} which is just the union of
+\texttt{Sym}, \texttt{SymExpr} and \texttt{Number} so we can define
+methods for some of the standard mathematical functions
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}27}]:} \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{+}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathy}\PY{p}{,} \PY{n}{y}\PY{o}{::}\PY{n}{mathy}\PY{p}{)}
+             \PY{k}{if} \PY{n}{x} \PY{o}{==} \PY{n}{y}
+                 \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{l+m+mi}{2}\PY{o}{*}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{p}{)}\PY{p}{)}
+             \PY{k}{elseif} \PY{n}{x} \PY{o}{==} \PY{o}{\PYZhy{}}\PY{n}{y}
+                 \PY{l+m+mi}{0}
+             \PY{k}{elseif} \PY{n}{x} \PY{o}{==} \PY{l+m+mi}{0}
+                 \PY{n}{y}
+             \PY{k}{elseif} \PY{n}{y} \PY{o}{==} \PY{l+m+mi}{0}
+                 \PY{n}{x}
+             \PY{k}{else}
+                 \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{o}{+}\PY{o}{\PYZdl{}}\PY{n}{y}\PY{p}{)}\PY{p}{)}
+             \PY{k}{end}
+         \PY{k}{end}
+         
+         \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{+}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathy}\PY{p}{)} \PY{o}{=} \PY{n}{x}
+\end{Verbatim}
+
+
+    The with these methods on the \texttt{+} operator, we can do things like
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{julia> :x + :y}
+\NormalTok{:(x + y)}
+
+\NormalTok{julia> :x - :y}
+\NormalTok{:(x - y)}
+
+\NormalTok{julia> :x + :x}
+\NormalTok{:(}\FloatTok{2}\NormalTok{x)}
+
+\NormalTok{julia> +:x}
+\NormalTok{:x}
+\end{Highlighting}
+\end{Shaded}
+
+Notice that in the final \texttt{else} statement, I use
+\texttt{symExpr(:(\$x+\$y))} which at this point just returns
+\texttt{:(\$x+\$y)}, ie. \texttt{symExpr} is just an identiy function on
+\texttt{Expr} types. Later, if we make our own \texttt{SymExpr} type to
+avoide type piracy, then we just need to modify \texttt{symExpr} to
+construct an object of type \texttt{SymExpr} instead of \texttt{Expr}
+and we won't need to modify any of our arithmetic functions!
+
+Now we can go and do the same for the subtration operator
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}20}]:} \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{\PYZhy{}}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathy}\PY{p}{,} \PY{n}{y}\PY{o}{::}\PY{n}{mathy}\PY{p}{)}
+             \PY{k}{if} \PY{n}{x} \PY{o}{==} \PY{n}{y}
+                 \PY{l+m+mi}{0}
+             \PY{k}{elseif} \PY{n}{x} \PY{o}{==} \PY{o}{\PYZhy{}}\PY{n}{y}
+                 \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{l+m+mi}{2}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{p}{)}\PY{p}{)}
+             \PY{k}{elseif} \PY{n}{x} \PY{o}{==} \PY{l+m+mi}{0}
+                 \PY{o}{\PYZhy{}}\PY{n}{y}
+             \PY{k}{elseif} \PY{n}{y} \PY{o}{==} \PY{l+m+mi}{0}
+                 \PY{n}{x}
+             \PY{k}{else}
+                 \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{o}{\PYZhy{}}\PY{o}{\PYZdl{}}\PY{n}{y}\PY{p}{)}\PY{p}{)}
+             \PY{k}{end}
+         \PY{k}{end}
+         
+         \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{\PYZhy{}}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{Sym}\PY{p}{)}
+             \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{p}{)}\PY{p}{)}
+         \PY{k}{end}
+         
+         \PY{n}{isUnaryOperation}\PY{p}{(}\PY{n}{ex}\PY{o}{::}\PY{n}{SymExpr}\PY{p}{)} \PY{o}{=} \PY{n}{length}\PY{p}{(}\PY{n}{ex}\PY{o}{.}\PY{n}{args}\PY{p}{)} \PY{o}{==} \PY{l+m+mi}{2}
+         \PY{n}{car}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{SymExpr}\PY{p}{)} \PY{o}{=} \PY{n}{x}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}
+         
+         \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{\PYZhy{}}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{SymExpr}\PY{p}{)}
+             \PY{k}{if} \PY{p}{(}\PY{n}{car}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{==} \PY{o}{:}\PY{o}{\PYZhy{}}\PY{p}{)} \PY{o}{\PYZam{}\PYZam{}} \PY{p}{(}\PY{n}{x} \PY{o}{|\PYZgt{}} \PY{n}{isUnaryOperation}\PY{p}{)}
+                 \PY{n}{symExpr}\PY{p}{(}\PY{n}{x}\PY{o}{.}\PY{n}{args}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}
+             \PY{k}{else}
+                 \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{p}{)}\PY{p}{)}
+             \PY{k}{end}
+         \PY{k}{end}
+\end{Verbatim}
+
+
+    The first method defined above tells us how to do basic subtration
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{julia> :x - :y}
+\NormalTok{:(x - y)}
+
+\NormalTok{julia> :x - :x}
+\FloatTok{0}
+\end{Highlighting}
+\end{Shaded}
+
+and the second two tell us how to negate a single argument, ie.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{julia> -:x}
+\NormalTok{:(-}\FloatTok{1}\NormalTok{x)}
+
+\NormalTok{julia> -(-(:x + }\FloatTok{1}\NormalTok{))}
+\NormalTok{:(x + }\FloatTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Now we can go and do similar things for multiplication, division,
+exponentitation and logarithms
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}30}]:} \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{*}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathy}\PY{p}{,}\PY{n}{y}\PY{o}{::}\PY{n}{mathy}\PY{p}{)}
+             \PY{k}{if} \PY{n}{x} \PY{o}{==} \PY{n}{y}
+                 \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{o}{\PYZca{}}\PY{l+m+mi}{2}\PY{p}{)}\PY{p}{)}
+             \PY{k}{elseif} \PY{n}{x} \PY{o}{==} \PY{o}{\PYZhy{}}\PY{n}{y}
+                 \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{o}{\PYZca{}}\PY{l+m+mi}{2}\PY{p}{)}\PY{p}{)}
+             \PY{k}{elseif} \PY{n}{x} \PY{o}{==} \PY{l+m+mi}{1}
+                 \PY{n}{y}
+             \PY{k}{elseif} \PY{n}{y} \PY{o}{==} \PY{l+m+mi}{1}
+                 \PY{n}{x}
+             \PY{k}{elseif} \PY{p}{(}\PY{n}{x} \PY{o}{==} \PY{l+m+mi}{0}\PY{p}{)} \PY{o}{||} \PY{p}{(}\PY{n}{y} \PY{o}{==} \PY{l+m+mi}{0}\PY{p}{)}
+                 \PY{l+m+mi}{0}
+             \PY{k}{else}
+                 \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{o}{*}\PY{o}{\PYZdl{}}\PY{n}{y}\PY{p}{)}\PY{p}{)}
+             \PY{k}{end}
+         \PY{k}{end}
+         
+         \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{/}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathy}\PY{p}{,} \PY{n}{y}\PY{o}{::}\PY{n}{mathy}\PY{p}{)}
+             \PY{k}{if} \PY{n}{x} \PY{o}{==} \PY{n}{y}
+                 \PY{l+m+mi}{1}
+             \PY{k}{elseif} \PY{n}{x} \PY{o}{==} \PY{o}{\PYZhy{}}\PY{n}{y}
+                 \PY{o}{\PYZhy{}}\PY{l+m+mi}{1}
+             \PY{k}{elseif} \PY{n}{y} \PY{o}{==} \PY{l+m+mi}{1}
+                 \PY{n}{x}
+             \PY{k}{else}
+                 \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{o}{/}\PY{o}{\PYZdl{}}\PY{n}{y}\PY{p}{)}\PY{p}{)}
+             \PY{k}{end}
+         \PY{k}{end}
+         
+         \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{\PYZca{}}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathy}\PY{p}{,} \PY{n}{y}\PY{o}{::}\PY{n}{mathy}\PY{p}{)}
+             \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{o}{\PYZca{}}\PY{o}{\PYZdl{}}\PY{n}{y}\PY{p}{)}\PY{p}{)}
+         \PY{k}{end}
+         
+         \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{\PYZca{}}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathy}\PY{p}{,} \PY{n}{y}\PY{o}{::}\PY{k+kt}{Int}\PY{p}{)} \PY{o}{=} \PY{n}{y} \PY{o}{==} \PY{l+m+mi}{1} \PY{o}{?} \PY{n}{x} \PY{o}{:} \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{o}{\PYZca{}}\PY{o}{\PYZdl{}}\PY{n}{y}\PY{p}{)}\PY{p}{)}
+         
+         \PY{n}{Base}\PY{o}{.}\PY{n}{log}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathy}\PY{p}{)} \PY{o}{=} \PY{n}{symExpr}\PY{p}{(}\PY{o}{:}\PY{p}{(}\PY{n}{log}\PY{p}{(}\PY{o}{\PYZdl{}}\PY{n}{x}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    Now we can write down all sorts of complicated symbolic expressions
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{julia> log(:x^}\FloatTok{4}\NormalTok{ + x^}\FloatTok{4}\NormalTok{)/:y + :y^(}\FloatTok{5}\NormalTok{(:x))}
+\NormalTok{:(log(}\FloatTok{2}\NormalTok{ * x ^ }\FloatTok{4}\NormalTok{) / y + y ^ (}\FloatTok{5}\NormalTok{x))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{exercise}{%
+\subsubsection{Exercise:}\label{exercise}}
+
+Try to follow the conventions used above to define symbolic versions of
+the trigonemtric functions
+
+\hypertarget{automatic-differentiation}{%
+\subsection{Automatic Differentiation}\label{automatic-differentiation}}
+
+Now we've built up an basic computer algebra system. A common use for
+such systems is the computation of derivatives. The conventional way to
+do this is by defining a set of rules for transforming an expression
+into its symbolic derivative. This technique is usually known simply as
+`symbolic differentiation'. A more interesting technique for achieving
+the same end is called `automatic differentiation'.
+
+Recall from first year calculus that the derivative of a function
+\(f(x)\) is defined as
+
+\[
+f'(x) \equiv \lim_{\Delta x \rightarrow 0} \frac{f(x+\Delta x) - f(x)}{\Delta x}
+\]
+
+We can also recall Taylor's theorem which states that for a well-behaved
+function \(f(x)\),
+
+\[
+f(x + \Delta x) = f(x) + f'(x) ~ \Delta x + \frac{1}{2}~ f''(x) ~ (\Delta x)^2 + \frac{1}{6}~ f'''(x) ~ (\Delta x)^3 + \mathcal{O}(\Delta x ^4)
+\]
+
+So now, lets imagine a \(\Delta x\) which is so small that
+\(\Delta x^2\) is \(0\) and we'll call this a `differential' \(dx\).
+
+So now Taylor's theorm simply states that
+
+\[
+f(x +  dx) = f(x) + f'(x) ~ dx
+\]
+
+where we can imagine \(dx\) as an infinitesimally small number. In
+standard numerical differentiation, one uses a small floating point
+number not far above the minimum precision of the computer as their
+value for \(dx\). Alternatively, we can make use of Julia's type system
+and define a new type which represents quantities of the form
+\(x + dx\).
+
+The idea here is actually very similar to the construction of complex
+numbers. With complex numbers, one simply says suppose there was such a
+number \(i\) such that \(i^2 = -1\) and then defines a type (or in
+mathematical language, an algebra) \texttt{Complex} (\(\mathbb{C}\)) and
+defines what basic functions like \texttt{+,\ -,\ *,\ /,\ \^{},\ log} do
+when acting on objects of type \texttt{Complex} (elements of
+\(\mathbb{C}\)).
+
+Similarly, we want to define a new number \(\epsilon\) such that
+\(\epsilon^2 = 0\). Hence, we can make a type \texttt{Differential} and
+then define methods on the \texttt{+,\ -,\ *,\ /,\ \^{},\ log} functions
+which will give them mathematically correct results.
+
+So first we make a new type:
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}32}]:} \PY{k}{type} \PY{n}{Differential}
+             \PY{n}{finite}\PY{o}{::}\PY{n}{mathy}
+             \PY{n}{differential}\PY{o}{::}\PY{n}{mathy}
+         \PY{k}{end}
+         
+         \PY{n}{differential}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{y}\PY{p}{)} \PY{o}{=} \PY{n}{y} \PY{o}{==} \PY{l+m+mi}{0} \PY{o}{?} \PY{n}{x} \PY{o}{:} \PY{n}{Differential}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{y}\PY{p}{)} 
+         
+         \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{n}{show}\PY{p}{(}\PY{n}{io}\PY{o}{::}\PY{k+kt}{IO}\PY{p}{,} \PY{n}{x}\PY{o}{::}\PY{n}{Differential}\PY{p}{)}
+             \PY{k}{if} \PY{p}{(}\PY{n}{x}\PY{o}{.}\PY{n}{finite}\PY{o}{==}\PY{l+m+mi}{0}\PY{p}{)} \PY{o}{\PYZam{}\PYZam{}} \PY{p}{(}\PY{n}{x}\PY{o}{.}\PY{n}{differential}\PY{o}{==}\PY{l+m+mi}{0}\PY{p}{)}
+                 \PY{n}{print}\PY{p}{(}\PY{n}{io}\PY{p}{,}\PY{l+s}{\PYZdq{}}\PY{l+s}{0}\PY{l+s}{\PYZdq{}}\PY{p}{)}
+             \PY{k}{else}
+                 \PY{n}{finiteStr} \PY{o}{=} \PY{p}{(}\PY{n}{x}\PY{o}{.}\PY{n}{finite} \PY{o}{==} \PY{l+m+mi}{0} \PY{o}{?} \PY{l+s}{\PYZdq{}}\PY{l+s}{\PYZdq{}} \PY{o}{:} \PY{l+s}{\PYZdq{}}\PY{l+s+si}{\PYZdl{}}\PY{p}{(}\PY{n}{x}\PY{o}{.}\PY{n}{finite}\PY{p}{)}\PY{l+s}{ }\PY{l+s}{+}\PY{l+s}{ }\PY{l+s}{\PYZdq{}}\PY{p}{)}
+                 \PY{n}{diffStr} \PY{o}{=} \PY{p}{(}\PY{n}{x}\PY{o}{.}\PY{n}{differential} \PY{o}{==} \PY{l+m+mi}{0} \PY{o}{?} \PY{l+s}{\PYZdq{}}\PY{l+s}{\PYZdq{}} \PY{o}{:} 
+                     \PY{n}{x}\PY{o}{.}\PY{n}{differential} \PY{o}{==} \PY{l+m+mi}{1} \PY{o}{?} \PY{l+s}{\PYZdq{}}\PY{l+s}{\PYZdq{}} \PY{o}{:} 
+                     \PY{n}{x}\PY{o}{.}\PY{n}{differential} \PY{n}{isa} \PY{k+kt}{Expr} \PY{o}{?} \PY{l+s}{\PYZdq{}}\PY{l+s}{(}\PY{l+s+si}{\PYZdl{}}\PY{p}{(}\PY{n}{x}\PY{o}{.}\PY{n}{differential}\PY{p}{)}\PY{l+s}{)}\PY{l+s}{\PYZdq{}} \PY{o}{:} \PY{l+s}{\PYZdq{}}\PY{l+s+si}{\PYZdl{}}\PY{p}{(}\PY{n}{x}\PY{o}{.}\PY{n}{differential}\PY{p}{)}\PY{l+s}{\PYZdq{}}\PY{p}{)}
+                 \PY{n}{print}\PY{p}{(}\PY{n}{io}\PY{p}{,}\PY{n}{finiteStr}\PY{o}{*}\PY{n}{diffStr}\PY{o}{*}\PY{l+s}{\PYZdq{}}\PY{l+s}{ϵ}\PY{l+s}{\PYZdq{}}\PY{p}{)}
+             \PY{k}{end}
+         \PY{k}{end}
+         
+         \PY{n}{differential}\PY{p}{(}\PY{o}{:}\PY{n}{x}\PY{p}{,}\PY{o}{:}\PY{n}{y}\PY{p}{)}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}32}]:} x + yϵ
+\end{Verbatim}
+            
+    The last function shown above just tells Julia how we'd like it to
+display functions of type \texttt{Differential}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{julia> differential(:x, :y)}
+\NormalTok{x + yϵ}
+
+\NormalTok{julia> differential(}\FloatTok{0}\NormalTok{, (:x^}\FloatTok{2}\NormalTok{ + :y))}
+\NormalTok{(x^}\FloatTok{2}\NormalTok{ + y)ϵ}
+
+\NormalTok{julia> differential(:x, }\FloatTok{1}\NormalTok{)}
+\NormalTok{x + ϵ}
+\end{Highlighting}
+\end{Shaded}
+
+Now we can define a new union type that includes \texttt{Differential}s
+and some helper functions for extracting out the \texttt{finite} and
+infinitesimal parts of a quantity.
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}35}]:} \PY{n}{mathyDiff} \PY{o}{=} \PY{k+kt}{Union}\PY{p}{\PYZob{}}\PY{n}{mathy}\PY{p}{,}\PY{n}{Differential}\PY{p}{\PYZcb{}}
+         
+         \PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathyDiff}\PY{p}{)} \PY{o}{=} \PY{n}{x} \PY{n}{isa} \PY{n}{Differential} \PY{o}{?} \PY{n}{x}\PY{o}{.}\PY{n}{finite} \PY{o}{:} \PY{n}{x}
+         \PY{n}{diffPart}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathyDiff}\PY{p}{)} \PY{o}{=} \PY{n}{x} \PY{n}{isa} \PY{n}{Differential} \PY{o}{?} \PY{n}{x}\PY{o}{.}\PY{n}{differential} \PY{o}{:} \PY{l+m+mi}{0}\PY{p}{;}
+\end{Verbatim}
+
+
+    To see these in action
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{julia> z = differential(:x, :y);}
+\NormalTok{julia> finitePart(z)}
+\NormalTok{:x}
+
+\NormalTok{julia> diffPart(z)}
+\NormalTok{:y}
+
+\NormalTok{julia> finitePart(}\FloatTok{1.05}\NormalTok{)}
+\FloatTok{1.05}
+
+\NormalTok{julia> diffPart(}\FloatTok{1.05}\NormalTok{)}
+\FloatTok{0}
+\end{Highlighting}
+\end{Shaded}
+
+    Now recall that
+
+\[f'(x) = {(f(x+ϵ) - f(x)) \over ϵ}~~.\]
+
+We can then make a Julian derivative function
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}73}]:} \PY{n}{D}\PY{p}{(}\PY{n}{f}\PY{o}{::}\PY{k+kt}{Function}\PY{p}{)} \PY{o}{=} \PY{n}{x} \PY{o}{\PYZhy{}}\PY{o}{\PYZgt{}} \PY{n}{diffPart}\PY{p}{(}\PY{n}{f}\PY{p}{(}\PY{n}{x} \PY{o}{+} \PY{n}{ϵ}\PY{p}{)}\PY{p}{)}\PY{p}{;}
+\end{Verbatim}
+
+
+    Now once Julia has methods for the standard mathematical functions so
+that they know how to deal with \texttt{Differential}s, our function
+\texttt{D} will perform automatic differentiation!
+
+Addition and aubtration are straightforward, you simply add (subtract)
+the finite parts and the differential parts together separately:
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}74}]:} \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{+}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathyDiff}\PY{p}{,}\PY{n}{y}\PY{o}{::}\PY{n}{mathyDiff}\PY{p}{)}
+             \PY{n}{differential}\PY{p}{(}\PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{+} \PY{n}{finitePart}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{p}{,} \PY{n}{diffPart}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{+} \PY{n}{diffPart}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{p}{)}
+         \PY{k}{end}
+         
+         \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{\PYZhy{}}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathyDiff}\PY{p}{,}\PY{n}{y}\PY{o}{::}\PY{n}{mathyDiff}\PY{p}{)}
+             \PY{n}{differential}\PY{p}{(}\PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{finitePart}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{p}{,} \PY{n}{diffPart}\PY{p}{(}\PY{n}{x}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{diffPart}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{p}{)}
+         \PY{k}{end}
+\end{Verbatim}
+
+
+    Now for multiplication. This is pretty strightforward, we simply use the
+rule that \(\epsilon^2 = 0\). So lets suppose we have two
+\texttt{Differential} numbers, \(u = x + y~ \epsilon\) and
+\(v = z + w~ \epsilon\).
+
+\begin{align}
+u * v &= (x + y~\epsilon)(z + w~\epsilon)\\
+&= xz + (xw + yz)\epsilon + yw \epsilon^2\\
+&= xz + (xw + yz)\epsilon
+\end{align}
+
+In Julia we can express this proceedure as
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}78}]:} \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{*}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathyDiff}\PY{p}{,} \PY{n}{y}\PY{o}{::}\PY{n}{mathyDiff}\PY{p}{)}
+             \PY{n}{differential}\PY{p}{(}\PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{*}\PY{n}{finitePart}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{p}{,} \PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{*}\PY{n}{diffPart}\PY{p}{(}\PY{n}{y}\PY{p}{)} \PY{o}{+} \PY{n}{diffPart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{*}\PY{n}{finitePart}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{p}{)}
+         \PY{k}{end}
+         
+         \PY{n}{ϵ} \PY{o}{=} \PY{n}{differential}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{;}
+\end{Verbatim}
+
+
+    With that definition, Julia now knows how to take derivatives of
+functions involving multiplication and we get the product rule for free!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{julia> f(x) = }\FloatTok{2}\NormalTok{*x;}
+\NormalTok{julia> g(x) = }\FloatTok{4}\NormalTok{*x;}
+\NormalTok{julia> h(x) = f(x)*g(x);}
+
+\NormalTok{julia> f(:x+ϵ)}
+\FloatTok{2}\NormalTok{*x + }\FloatTok{2}\NormalTok{ϵ}
+
+\NormalTok{julia> D(f)(:x)}
+\FloatTok{2}
+
+\NormalTok{julia> g(:x + ϵ)}
+\FloatTok{4}\NormalTok{*x + ϵ}
+
+\NormalTok{julia> D(g)(:x)}
+\FloatTok{4}
+
+\NormalTok{julia> h(:x + ϵ)}
+\NormalTok{(}\FloatTok{2}\NormalTok{x) * (}\FloatTok{4}\NormalTok{x) + ((}\FloatTok{2}\NormalTok{x) * }\FloatTok{4}\NormalTok{ + }\FloatTok{2}\NormalTok{ * (}\FloatTok{4}\NormalTok{x))ϵ}
+
+\NormalTok{julia> D(h)(:x)}
+\NormalTok{:((}\FloatTok{2}\NormalTok{x) * }\FloatTok{4}\NormalTok{ + }\FloatTok{2}\NormalTok{ * (}\FloatTok{4}\NormalTok{x))}
+\end{Highlighting}
+\end{Shaded}
+
+We can see here that our automatic derivative function has correctly
+performed the chain rule (though the simplification of the result left a
+little to be desired).
+
+We can teach Julia how to use the quotient rule as follows:
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}40}]:} \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{/}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathyDiff}\PY{p}{,} \PY{n}{y}\PY{o}{::}\PY{n}{mathyDiff}\PY{p}{)}
+             \PY{p}{(}\PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{/}\PY{n}{finitePart}\PY{p}{(}\PY{n}{y}\PY{p}{)} \PY{o}{+} \PY{n}{ϵ}\PY{o}{*}\PY{p}{(}\PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{*}\PY{n}{diffPart}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{o}{/}\PY{n}{finitePart}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{o}{\PYZca{}}\PY{l+m+mi}{2}\PY{p}{)}\PY{p}{)} \PY{o}{+} \PY{n}{ϵ}\PY{o}{*}\PY{p}{(}\PY{n}{diffPart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{/}\PY{n}{finitePart}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{p}{)}
+         \PY{k}{end}
+\end{Verbatim}
+
+
+    This simply says that \[
+\frac{x}{y + \epsilon} = {x\over y}+ \frac{x}{y^2}\epsilon
+\]
+
+Now we can do
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{julia> D(x -> }\FloatTok{1}\NormalTok{/x)(:x)}
+\FloatTok{1}\NormalTok{/:x^}\FloatTok{2}
+\end{Highlighting}
+\end{Shaded}
+
+Likewise, we can teach Julia how to deal with exponents
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}97}]:} \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{\PYZca{}}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{Differential}\PY{p}{,} \PY{n}{y}\PY{o}{::}\PY{n}{mathy}\PY{p}{)}
+             \PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{\PYZca{}}\PY{n}{y} \PY{o}{+} \PY{n}{y}\PY{o}{*}\PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{\PYZca{}}\PY{p}{(}\PY{n}{y}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)}\PY{o}{*}\PY{n}{diffPart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{*}\PY{n}{ϵ}
+         \PY{k}{end}
+         
+         \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{\PYZca{}}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{Differential}\PY{p}{,} \PY{n}{y}\PY{o}{::}\PY{k+kt}{Int}\PY{p}{)}
+             \PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{\PYZca{}}\PY{n}{y} \PY{o}{+} \PY{n}{y}\PY{o}{*}\PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{\PYZca{}}\PY{p}{(}\PY{n}{y}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)}\PY{o}{*}\PY{n}{diffPart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{*}\PY{n}{ϵ}
+         \PY{k}{end}
+            
+         \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{o}{:}\PY{o}{\PYZca{}}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{mathy}\PY{p}{,} \PY{n}{y}\PY{o}{::}\PY{n}{Differential}\PY{p}{)}
+             \PY{n}{x}\PY{o}{\PYZca{}}\PY{n}{finitePart}\PY{p}{(}\PY{n}{y}\PY{p}{)} \PY{o}{+} \PY{n}{log}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{*}\PY{n}{x}\PY{o}{\PYZca{}}\PY{n}{finitePart}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{o}{*}\PY{n}{diffPart}\PY{p}{(}\PY{n}{y}\PY{p}{)}\PY{o}{*}\PY{n}{ϵ}
+         \PY{k}{end}
+\end{Verbatim}
+
+
+    Now we can take derivatives of exponential functions!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{julia> D(x -> x^}\FloatTok{2}\NormalTok{)(:x)}
+\NormalTok{:(}\FloatTok{2}\NormalTok{x)}
+
+
+\NormalTok{julia> D(x -> }\FloatTok{4}\NormalTok{*x^}\FloatTok{5}\NormalTok{)(:x)}
+\NormalTok{:(}\FloatTok{4}\NormalTok{ * (}\FloatTok{5}\NormalTok{ * x ^ }\FloatTok{4}\NormalTok{))}
+
+\NormalTok{julia> D(x -> (}\FloatTok{1}\NormalTok{ + x)*x^-}\FloatTok{4}\NormalTok{ )(:x)}
+\NormalTok{:((}\FloatTok{1}\NormalTok{ + x) * (-}\FloatTok{4}\NormalTok{ * x ^ -}\FloatTok{5}\NormalTok{) + x ^ -}\FloatTok{4}\NormalTok{)}
+
+\NormalTok{D(x -> }\FloatTok{2}\NormalTok{^x)(:x)}
+\NormalTok{:(}\FloatTok{0.6931471805599453}\NormalTok{ * }\FloatTok{2}\NormalTok{ ^ x)}
+
+\NormalTok{D(x -> x*}\FloatTok{2}\NormalTok{^x)(:x)}
+\NormalTok{:(x * (}\FloatTok{0.6931471805599453}\NormalTok{ * }\FloatTok{2}\NormalTok{ ^ x) + }\FloatTok{2}\NormalTok{ ^ x)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{exercise}{%
+\subsubsection{Exercise:}\label{exercise}}
+
+You may notice that I have left out a method allowing Julia to take
+derivatives of the form
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{julia> D(x -> x^x)(:x)}
+
+\NormalTok{MethodError: no method matching ^(::Differential, ::Differential)}
+\NormalTok{Closest candidates are:}
+\NormalTok{  ^(::Differential, ::}\DataTypeTok{Int64}\NormalTok{) at In[}\FloatTok{91}\NormalTok{]:}\FloatTok{6}
+\NormalTok{  ^(::Differential, ::}\DataTypeTok{Union}\NormalTok{\{}\DataTypeTok{Expr}\NormalTok{, }\DataTypeTok{Number}\NormalTok{, }\DataTypeTok{Symbol}\NormalTok{\}) at In[}\FloatTok{91}\NormalTok{]:}\FloatTok{2}
+\NormalTok{  ^(::}\DataTypeTok{Union}\NormalTok{\{}\DataTypeTok{Expr}\NormalTok{, }\DataTypeTok{Number}\NormalTok{, }\DataTypeTok{Symbol}\NormalTok{\}, ::Differential) at In[}\FloatTok{91}\NormalTok{]:}\FloatTok{10}
+\NormalTok{  ...}
+
+\NormalTok{Stacktrace:}
+\NormalTok{ [}\FloatTok{1}\NormalTok{] (::}\CommentTok{##7#8\{##23#24\})(::Symbol) at ./In[73]:1}
+\NormalTok{ [}\FloatTok{2}\NormalTok{] include_string(::}\DataTypeTok{String}\NormalTok{, ::}\DataTypeTok{String}\NormalTok{) at ./loading.jl:}\FloatTok{522}
+\end{Highlighting}
+\end{Shaded}
+
+To make such a derivative work, one needs to generalize the definition
+of \texttt{\^{}} to take two \texttt{Differential} arguments. This isn't
+difficult but it is messy so its left as an exercise to the reader.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+    Finally, knowing that \(\frac{d~log(x)}{dx} = {1 \over x}\), we can
+teach \texttt{log} to take \texttt{Differential\ aguments}:
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}96}]:} \PY{k}{function} \PY{n}{Base}\PY{o}{.}\PY{n}{log}\PY{p}{(}\PY{n}{x}\PY{o}{::}\PY{n}{Differential}\PY{p}{)}
+             \PY{n}{log}\PY{p}{(}\PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{p}{)} \PY{o}{+} \PY{n}{diffPart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{/}\PY{n}{finitePart}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{o}{*}\PY{n}{ϵ}
+         \PY{k}{end}
+\end{Verbatim}
+
+
+    and we can check if this gives us the correct behaviour:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{D(x -> log(x))(:x)}
+\NormalTok{:(}\FloatTok{1}\NormalTok{ / x)}
+
+\NormalTok{D(x -> log(x)^}\FloatTok{2}\NormalTok{ + }\FloatTok{4}\NormalTok{*x)(:x)}
+\NormalTok{:((}\FloatTok{2}\NormalTok{ * log(x)) * (}\FloatTok{1}\NormalTok{ / x) + }\FloatTok{4}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Great! With a little know-how and perserverence we've made a
+rudiementary symbolic math system and taught it how to take derivatives
+in Julian style!
+
+    \hypertarget{exercise}{%
+\subsubsection{Exercise:}\label{exercise}}
+
+If you did the earlier exerise of definiting \texttt{mathy} methods for
+the standard trigonometric functions, I suggest you see if you can
+define \texttt{Differential} methods for them so that you can take their
+derivatives.
+
+
+    % Add a bibliography block to the postdoc
+    
+    
+    
+    \end{document}

@@ -1,3 +1,4 @@
+ex = Union{Sym, SymExpr}
 
 walk(x, inner, outer) = outer(x)
 walk(x::SymExpr, inner, outer) = outer(SymExpr(x.head, map(inner, x.args)...))

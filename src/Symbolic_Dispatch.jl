@@ -1,22 +1,8 @@
-import Base.+
-import Base.-
-import Base.*
-import Base.^
-import Base./
-import Base.log
-import Base.sin
-import Base.cos
-import Base.dot
-import Base.zero
-import Base.show
-
-
-
 
 #_____________________________________________
 # Addition
 
-function +(f1::Function, f2::Function)
+function Base.:+(f1::Union{Function,Operator}, f2::Union{Function,Operator})
     if f1 == f2
         t -> 2*f1(t)
     else
@@ -24,29 +10,30 @@ function +(f1::Function, f2::Function)
     end
 end
 
-+(a::Number, f::Function) = t -> a + f(t)
-+(f::Function, a::Number) = +(a::Number, f::Function)
+Base.:+(a::Mathy, f::Union{Function,Operator}) = t -> a + f(t)
+Base.:+(f::Union{Function,Operator}, a::Mathy) = t -> f(t) + a
 
 
-function +(a::ex, b::ex)
-    if a == b
-        SymExpr(:(2 * $a))
+function Base.:+(x::Mathy, y::Mathy)
+    if x == y
+        SymExpr(:(2*$x))
+    elseif x == -y
+        0
+    elseif x == 0
+        y
+    elseif y == 0
+        x
     else
-        SymExpr(:($a + $b))
+        SymExpr(:($x+$y))
     end
 end
 
-function +(a::ex, b::T where T<:Number)
-    SymExpr(:($a + $b))
-end
+Base.:+(x::Mathy) = x
 
-+(b::T where T<:Number, a::ex) = +(a, b)
-
-+(a::ex) = a
 
 #_____________________________________________
 # Subtraction
-function -(f1::Function, f2::Function)
+function Base.:-(f1::Union{Function,Operator}, f2::Union{Function,Operator})
     if f1 == f2
         function (t)
             0
@@ -58,28 +45,42 @@ function -(f1::Function, f2::Function)
     end
 end
 
--(a::Number, f::Function) = t -> a - f(t)
--(f::Function, a::Number) = t -> f(t) - a
+Base.:-(a::Mathy, f::Union{Function,Operator}) = t -> a - f(t)
+Base.:-(f::Union{Function,Operator}, a::Mathy) = t -> f(t) - a
 
 
-function -(a::ex, b::ex)
-    if a == b
+function Base.:-(x::Mathy, y::Mathy)
+    if x == y
         0
+    elseif x == -y
+        SymExpr(:(2$x))
+    elseif x == 0
+        -y
+    elseif y == 0
+        x
     else
-        SymExpr(:($a + -$b))
+        SymExpr(:($x-$y))
     end
 end
 
--(a::ex, b::Number) = SymExpr(:($a + -$b))
+function Base.:-(x::Sym)
+    SymExpr(:(-$x))
+end
 
--(b::Number, a::ex) = SymExpr(:($b + -$a))
+isUnaryOperation(ex::SymExpr) = length(ex.args) == 2
+car(x::SymExpr) = x.args[1]
 
--(a::ex) = SymExpr(:(-1*$a))
-
+function Base.:-(x::SymExpr)
+    if (car(x) == :-) && (x |> isUnaryOperation)
+        SymExpr(x.args[2])
+    else
+        SymExpr(:(-$x))
+    end
+end
 
 #_____________________________________________
 # Multiplication
-function *(f1::Function, f2::Function)
+function Base.:*(f1::Function, f2::Function)
     if f1 == f2
         t -> f1(t)*f1(t)
     else
@@ -87,41 +88,38 @@ function *(f1::Function, f2::Function)
     end
 end
 
-function *(f1::Operator, f2::Function)
+function Base.:*(f1::Operator, f2::Operator)
     t -> (f1(f2))(t)
 end
 
-*(a::Number, f::Function) = t -> a*f(t)
-*(f::Function, a::Number) = *(a::Number, f::Function)
 
-function *(a::ex, b::ex)
-    if (a == b) && (typeof(a) == Sym) && (typeof(b) == Sym)
-        SymExpr(:($a^2))
-    else
-        SymExpr(:($a*$b))
-    end
-end
+Base.:*(a::Mathy, f::Union{Function,Operator}) = t -> a*f(t)
+Base.:*(f::Union{Function,Operator}, a::Mathy) = *(a, f)
 
-
-function *(a::ex, b::Number)
-    if b == 1
-        a
-    elseif b == 0
+function Base.:*(x::Mathy,y::Mathy)
+    if x == y
+        SymExpr(:($x^2))
+    elseif x == -y
+        SymExpr(:(-$x^2))
+    elseif x == 1
+        y
+    elseif y == 1
+        x
+    elseif (x == 0) || (y == 0)
         0
     else
-        SymExpr(:($b * $a))
+        SymExpr(:($x*$y))
     end
 end
 
-*(b::Number, a::ex) = *(a, b)
 
-dot(a::Union{ex, Number}, b::Union{ex, Number}) = a*b
-zero(a::ex) = 0
+Base.dot(a::Mathy, b::Mathy) = a*b
+Base.zero(a::Mathy) = 0
 
 #_____________________________________________
 # Division
 
-function /(f1::Function, f2::Function)
+function Base.:/(f1::Function, f2::Function)
     if f1 == f2
         t -> 1
     else
@@ -129,81 +127,57 @@ function /(f1::Function, f2::Function)
     end
 end
 
-/(a::Number, f::Function) = t -> a/f(t)
-/(f::Function, a::Number) = t -> f(t)/a
+Base.:/(a::Mathy, f::Function) = t -> a/f(t)
+Base.:/(f::Function, a::Mathy) = t -> f(t)/a
 
-function /(a::ex, b::ex)
-    if a == b
+function Base.:/(x::Mathy, y::Mathy)
+    if x == y
         1
+    elseif x == -y
+        -1
+    elseif y == 1
+        x
     else
-        SymExpr(:($a / $b))
+        SymExpr(:($x/$y))
     end
 end
-
-
-function /(a::ex, b::T where T<:Number)
-    if b == 1
-        a
-    else
-        SymExpr(:($a / $b))
-    end
-end
-
-
-function /(b::T where T<:Number, a::ex)
-    if b == 1
-        SymExpr(:(1/$a))
-    else
-        SymExpr(:($a / $b))
-    end
-end
-
-
 
 #_____________________________________________
 # Exponents
 
-function ^(a::Operator, b::Integer)
+function Base.:^(a::Operator, b::Integer)
     function (t)
         foldl((x,y)->a(x),t,1:b)
     end
 end
 
-function ^(a::ex, b::Number)
-    if b == 1
-        SymExpr(:($a))
-    else
-        SymExpr(:($a^$b))
-    end
-end
-
-function ^(a::ex, b::Integer)
-    if b == 1
-        SymExpr(:($a))
-    else
-        SymExpr(:($a^$b))
-    end
-end
-
-
-function ^(a::Number, b::ex)
-    if a == 1
+function Base.:^(x::Mathy, y::Mathy)
+    if y == 0
         1
+    elseif y == 1
+        x
     else
-        SymExpr(:($a^$b))
+        SymExpr(:($x^$y))
     end
 end
 
-^(a::ex, b::ex) = SymExpr(:($a^$b))
+Base.:^(x::Mathy, y::Int) = y == 1 ? x : y == 0 ? 1: SymExpr(:($x^$y))
 
 
 #_____________________________________________
 # Logarithms
-log(a::ex) = SymExpr(:(log($a)))
+Base.log(x::Mathy) = SymExpr(:(log($x)))
 
 
 
 #_____________________________________________
 # Trig
-sin(x::ex) = SymExpr(:(sin($x)))
-cos(x::ex) = SymExpr(:(cos($x)))
+Base.sin(x::Mathy) = SymExpr(:(sin($x)))
+Base.cos(x::Mathy) = SymExpr(:(cos($x)))
+
+#______________________________________________
+#Commutator
+QMathy = Union{Operator, Mathy}
+function commutator(x::Operator,y::Operator)
+    x*y - y*x
+end

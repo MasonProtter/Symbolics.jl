@@ -1,50 +1,61 @@
 push!(LOAD_PATH, "/Users/mason/Documents/Julia/Symbolics.jl/src");
 using Symbolics
 
+struct QOp <: Symbolics.Operator end
+const X = QOp()
+X(ψ) = x -> x*ψ
 
-@syms a b c d;
+@syms x y z;
 
-
-macro twostep(arg)
-           println("I execute at parse time. The argument is: ", arg)
-           return :(println("I execute at runtime. The argument is: ", $arg))
-end
-
-ex = macroexpand( :(@twostep :(1, 2, 3)) );
-@twostep :(1, 2, 3)
-
-:(x + y).args
+D(D(x -> x^3 - 4x^2))(x)
 
 
+S = Sx + Sy + Sz
 
 
-macro addition_to_multiplication(x)
-           for i in 1:length(x.args)
-                      if x.args[i] == :+
-                                 x.args[i] = :*
-                      end
-           end
-           x
-end
-
-@addition_to_multiplication 5 + 3 * 6
-
-
-@showarg(x+1)
+Sx = 1/2 *
 
 
 
-:(x + y * (1 + 2))
-:(x + y*3)
+ϵ1
 
-using MacroTools
+X(x -> e^-(x^2))(x)
 
-MacroTools.postwalk(x -> if , :(x + y * (1 + 2)))
+f = LiteralFunction(:f)
+f(x)
 
-:(x + y * (1 + 2)).args
-
-@show(x+y)
+D(X(f))(x)
 
 
+D(x -> f(x)^2 + x)(x)
 
-MacroTools.postwalk(x -> x ? )
+
+f(x) = log(x^4)^2
+D(f)(x)
+
+
+-> ExtractDiffPart(f(x + ϵ))
+-> ExtractDiffPart((log((x+ϵ)^4))^2)
+-> ExtractDiffPart((log(x^4 + 4*x^3*ϵ))^2)
+-> ExtractDiffPart((log(x^4) + 4*x^3*ϵ/x^4)^2)
+-> ExtractDiffPart((log(x^4))^2 + 2*log(x^4)*4*x^3/x^4*ϵ)
+-> 2*log(x^4)*4*x^3/x^4
+
+
+using HCubature
+∫=hquadrature
+
+f(ω,x) = ω*sin(x)^2
+
+F(ω) = ∫(x -> f(ω,x), 0, 2π, maxevals=100)[1]
+
+F(0)
+
+F(1.1)
+
+(x->f(ω, x))(1)
+
+
+
+L(q,q̇,t) = m*q̇^2/2
+integrateLagrangian(L, )

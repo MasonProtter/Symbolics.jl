@@ -56,7 +56,7 @@ D(x)(t)
 ```julia
 @syms m, ω, t
 
-function Γ(w::UpTuple)
+function Γ(w)
     function (t)
         UpTuple(t, w(t), D(w)(t))
     end

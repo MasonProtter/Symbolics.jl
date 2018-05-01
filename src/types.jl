@@ -27,7 +27,7 @@ Base.:(==)(x::Sym, y::Sym) = x.name == y.name ? true : false
 #---------------------------------------------------------------
 # SymExprs
 struct SymExpr
-    op::Function
+    op::Union{Function, Symbol, Expr, Sym, SymExpr}
     args::Vector
 end
 
@@ -85,7 +85,7 @@ function Base.show(io::IO, f::LiteralFunction)
     print(io, f.name)
 end
 
-(f::LiteralFunction)(t) = :($(f.name)($t))
+(f::LiteralFunction)(t) = SymExpr(f.name, [t])
 
 #---------------------------------------------------------------
 #---------------------------------------------------------------

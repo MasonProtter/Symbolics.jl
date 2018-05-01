@@ -108,6 +108,6 @@ function D(f::Function)
 end
 
 D(f::LiteralFunction) = LiteralFunction(:(D($(f.name))))
-(f::LiteralFunction)(t) = SymExpr(:($(f.name)($t)))
 
 (f::LiteralFunction)(Dt::Differential) = f(Dt[1:end-1]) + D(f)(Dt[1:end-1])*Dt[end]
+

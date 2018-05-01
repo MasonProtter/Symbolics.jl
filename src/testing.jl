@@ -3,11 +3,11 @@ using Revise
 using Symbolics
 # using ForwardDiff
 
-# @edit("Symbolics.jl")
+@edit("Calculus.jl")
 @edit("types.jl")
 @edit("Simplification.jl")
 
-@syms x y z;
+@syms x y z t m ω;
 
 (2(x^2))^2
 
@@ -22,3 +22,19 @@ Symbolics.postwalk(node -> @show(node), ex)
 ex = x^2
 
 ex.args
+
+x^2 + x^2
+
+f(x) = x^3;
+g(x) = x^2;
+(f+g)(x)
+(f*g)(x)
+
+(D^3)(f+g)(x)
+
+
+
+x = LiteralFunction(:x)
+
+
+D(x)(t)

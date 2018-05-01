@@ -1,7 +1,8 @@
 ex = Union{Sym, SymExpr}
 
 walk(x, inner, outer) = outer(x)
-walk(x::SymExpr, inner, outer) = outer(SymExpr(x.head, map(inner, x.args)...))
+walk(x::SymExpr, inner, outer) = outer(SymExpr(inner(x.op), map(inner, x.args)))
+walk(x::Expr, inner, outer) = outer(Expr(x.head, map(inner, x.args)...))
 postwalk(f, x) = walk(x, x -> postwalk(f, x), f)
 
 
@@ -32,26 +33,26 @@ walk_expand_unravel(num::Number) = num
 
 
 function unravel_brackets(expr::SymExpr)
-    if expr.args[1] == :+
-        for i in 2:length(expr.args)
-            if (typeof(expr.args[i]) == SymExpr) && (length(expr.args[i].args) >= 3) && ((expr.args[i]).args[1] == :+)
+    if expr.op == +
+        for i in 1:length(expr.args)
+            if (typeof(expr.args[i]) == SymExpr) && (length(expr.args[i].args) >= 2) && ((expr.args[i]).op == +)
                 x = expr.args[i]
-                fn = eval(x.args[1])
+                fn = x.op
                 deleteat!(expr.args, i)
-                for j in 2:length(x.args)
-                    insert!(expr.args, i+j-2, j== 2 ? (x.args[j]) : fn(x.args[j]))
+                for j in 1:length(x.args)
+                    insert!(expr.args, 1, j== 1 ? (x.args[j]) : fn(x.args[j]))
                 end
             end
         end
     end
-    if expr.args[1] == :*
-        for i in 2:length(expr.args)
-            if (typeof(expr.args[i]) == SymExpr) && (length(expr.args[i].args) >= 3) && ((expr.args[i]).args[1] == :*)
+    if expr.op == *
+        for i in 1:length(expr.args)
+            if (typeof(expr.args[i]) == SymExpr) && (length(expr.args[i].args) >= 2) && ((expr.args[i]).op == *)
                 x = expr.args[i]
-                fn = eval(x.args[1])
+                fn = x.op
                 deleteat!(expr.args, i)
-                for j in 2:length(x.args)
-                    insert!(expr.args, i+j-2, (x.args[j]))
+                for j in 1:length(x.args)
+                    insert!(expr.args, 1, x.args[j])
                 end
             end
         end
@@ -64,7 +65,7 @@ unravel_brackets(a::Union{Number, Sym}) = a
 function expand_term(expr::SymExpr)
     expr |> apply_algebraic_rules
 end
-expand_term(a::Union{Sym, Number, Symbol}) = a
+expand_term(a::Union{Sym, Number, Symbol, Function}) = a
 
 
 
@@ -84,20 +85,19 @@ function apply_algebraic_rules(expr::SymExpr)
 end
 
 
-
 function distribute_negation(expr::ex)
-    @capture(expr.expr, -(+(x__))) && (expr = +([-x[i] for i in 1:length(x)]...))
-    expr
+    @capture(expr |> Expr, -(+(x__))) && (expr = +([-x[i] for i in 1:length(x)]...))
+    SymExpr(expr)
 end
 
 function negate(expr::ex)
-    @capture(expr.expr, -x_) && (expr = -1*x)
-    expr
+    @capture(Expr(expr), -x_) && (expr = -1*x)
+    SymExpr(expr)
 end
 
 function pos_x_equals_x(expr::ex)
-    if (typeof(expr) == SymExpr) && (expr.args[1] == :+) && (length(expr.args) == 2)
-        expr = expr.args[2]
+    if (typeof(expr) == SymExpr) && (expr.op == :+) && (length(expr.args) == 1)
+        expr = expr.args[1]
     end
     expr
 end
@@ -121,28 +121,28 @@ end
 
 
 function collect_identical(expr::SymExpr)
-    f = expr.args[1]
-    body = expr.args[2:end]
+    f = expr.op
+    body = expr.args
     duplicate_indices = find_first_duplicates(body)
     multiplicity = length(duplicate_indices)
-    if (expr.args[1] == :+) && (multiplicity > 0)
+    if (f == +) && (multiplicity > 0)
         x = body[duplicate_indices[1]]
         deleteat!(body, duplicate_indices)
         insert!(body, duplicate_indices[1], multiplicity*x)
         if length(body) == 1
             expr = body[1]
         else
-            expr = SymExpr(:call, f, body...)
+            expr = SymExpr(f, body)
         end
     end
-    if (expr.args[1] == :*) && (multiplicity > 0)
+    if (expr.args[1] == *) && (multiplicity > 0)
         x = body[duplicate_indices[1]]
         deleteat!(body, duplicate_indices)
         insert!(body, duplicate_indices[1], x^multiplicity)
         if length(body) == 1
             expr = body[1]
         else
-            expr = SymExpr(:call, f, body...)
+            expr = SymExpr(f, body)
         end
     end
     expr
@@ -152,16 +152,16 @@ collect_identical(a::Union{Number,Sym}) = a
 
 
 function collect_numeric(expr::SymExpr)
-    f = expr.args[1]
-    if length(expr.args) > 3
-        body = expr.args[2:end]
-        if (f == :+) || (f == :*)
+    f = expr.op
+    if length(expr.args) > 2
+        body = expr.args
+        if (f == +) || (f == *)
             indices = find(x -> x isa Number, body)
             if length(indices) > 1
                 numbers = body[indices]
                 deleteat!(body, indices)
                 insert!(body, 1, eval(f)(numbers...))
-                expr = Expr(:call, f, body...)
+                expr = SymExpr(f, body)
             end
         end
     end
@@ -170,13 +170,16 @@ end
 collect_numeric(a::Union{Number, Sym}) = a
 
 function expt_one(expr::ex)
-    @capture(expr.expr, x_^1) && (expr = x)
-    expr
+    if expr.op == (^) && expr.args[2] == 1
+        expr.args[1]
+    else
+        expr
+    end
 end
 expt_one(num::Number) = num
 
 function apply_mult_zero(expr::ex)
-    if (typeof(expr) == SymExpr) && (expr.args[1] == :*)
+    if (typeof(expr) == SymExpr) && (expr.op == *)
         if length(find(x -> x == 0, expr.args)) > 0
             expr = 0
         end
@@ -186,28 +189,28 @@ end
 apply_mult_zero(num::Number) = num
 
 function remove_identity_operations(expr::SymExpr)
-    if expr.args[1] == :+
+    if expr.op == +
         lst = find(x -> x == 0 , expr.args)
         if length(lst) > 0
             deleteat!(expr.args, lst[1])
         end
-    elseif expr.args[1] == :*
+    elseif expr.args[1] == *
         lst = find(x -> x == 1 , expr.args)
-        if (length(expr.args) == 3) && (length(find(x -> (x != 1) && (x != :*), expr.args)) == 1)
-            return expr.args[find(x -> (x != 1) && (x != :*), expr.args)...]
+        if (length(expr.args) == 2) && (length(find(x -> (x != 1), expr.args)) == 1)
+            return expr.args[find(x -> (x != 1), expr.args)...]
         end
         if (length(lst) > 0)
             deleteat!(expr.args, lst[1])
         end
     end
-    SymExpr(expr.head, expr.args...)
+    expr
 end
 remove_identity_operations(sym::Sym) = sym
 remove_identity_operations(num::Number) = num
 
 
 function evaluate_numeric(expr::SymExpr)
-    if (expr.args[2:end] |> is_all_numbers) && (expr.args[1] != :D)
+    if (expr.args[1:end] |> is_all_numbers)
         eval(expr)
     else
         expr
@@ -225,3 +228,4 @@ function is_all_numbers(list::Array)
     end
     true
 end
+

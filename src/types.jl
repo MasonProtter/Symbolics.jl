@@ -19,37 +19,59 @@ macro syms(names...)
    esc(out)
 end
 
+Base.:(==)(x::Sym, y::Real) = false
+Base.:(==)(x::Real, y::Sym) = false
+Base.:(==)(x::Sym, y::Sym) = x.name == y.name ? true : false
 
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # SymExprs
-
-@auto_hash_equals struct SymExpr
-    expr::Union{Expr, SymExpr}
-    head::Symbol
-    args::Array
+struct SymExpr
+    op::Function
+    args::Vector
 end
 
-SymExpr(head::Symbol, args...) = SymExpr(Expr(head, args...))
-SymExpr(expr::Expr) = SymExpr(expr, expr.head, expr.args)
-SymExpr(expr::SymExpr) = SymExpr(expr.expr, expr.head, expr.args)
-
-
-function to_Expr(a::SymExpr)
-    Expr(a.head, [i isa SymExpr ? to_Expr(i) :
-                  i isa Sym ? i.name :
-                  i for i in a.args]...)
+function Base.:(==)(x::SymExpr,y::SymExpr)
+    x.op == y.op && length(x.args) == length(y.args) && all(isequal.(x.args,y.args))
 end
 
-function Base.show(io::IO, symexpr::SymExpr)
-    print(io, symexpr.expr)
-end
+Base.:(==)(x::SymExpr,y::Number) = false
+Base.:(==)(x::Number,y::SymExpr) = false
+Base.:(==)(x::SymExpr,y::Void) = false
+Base.:(==)(x::Void,y::SymExpr) = false
+Base.:(==)(x::Sym,y::SymExpr) = y == SymExpr(identity,x)
+Base.:(==)(x::SymExpr,y::Sym) = x == SymExpr(identity,y)
 
-Base.eval(a::SymExpr) = eval(a.expr)
+SymExpr(x::Expr) = SymExpr(eval(x.args[1]), x.args[2:end])
+SymExpr(x::SymExpr) = x
+SymExpr(f::Function, arg::Union{Sym, Number}) = SymExpr(f, [arg])
+SymExpr(f::Sym, arg::Union{Sym, Number}) = SymExpr(eval(f.name), [arg])
+SymExpr(x::Vector) = SymExpr(x[1], x[2:end])
+SymExpr(f::Sym, args::Vector) = SymExpr(eval(f.name), args)
+
+Base.Expr(x::SymExpr) = Expr(:call, Symbol(x.op), [i isa SymExpr ? Expr(i) :
+                                                   i isa Sym ? i.name :
+                                                   i
+                                                   for i in x.args]...)
+
+Base.show(io::IO,x::SymExpr) = print(io,string(Expr(x)))
+
+Base.eval(a::SymExpr) = eval(Expr(a))
+
+# function to_Expr(a::SymExpr)
+#     Expr(a.head, [i isa SymExpr ? to_Expr(i) :
+#                   i isa Sym ? i.name :
+#                   i for i in a.args]...)
+# end
+
+# function Base.show(io::IO, symexpr::SymExpr)
+#     print(io, string(symexpr.expr))
+# end
+
+
 
 
 Mathy = Union{Number, Sym, SymExpr}
-
 
 #---------------------------------------------------------------
 #---------------------------------------------------------------

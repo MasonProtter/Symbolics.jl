@@ -70,7 +70,7 @@ Base.:-(Dx::Differential, Dy::Differential) = binaryOp((x,y) -> x - y,
                                                        (x,y) -> -1)(Dx,Dy)
 
 Base.:/(Dx::Differential,y::Mathy) = unaryOp(Dx -> Dx/y, Dx -> 1/y)(Dx)
-Base.:/(x::Mathy,Dy::Differential) = unaryOp(Dy -> x/Dy, Dy -> -1/(Dy)^2)(Dx)
+Base.:/(x::Mathy,Dy::Differential) = unaryOp(Dy -> x/Dy, Dy -> -1/(Dy)^2)(Dy)
 Base.:/(Dx::Differential,Dy::Differential) = binaryOp((x,y) -> x/y,
                                                       (x,y) -> 1/y,
                                                       (x,y) -> -x/y^2)(Dx,Dy)
@@ -110,4 +110,4 @@ end
 D(f::LiteralFunction) = LiteralFunction(:(D($(f.name))))
 (f::LiteralFunction)(t) = SymExpr(:($(f.name)($t)))
 
-(f::LiteralFunction)(Dt::Symbolics.Differential) = f(Dt[1:end-1]) + D(f)(Dt[1:end-1])*Dt[end]
+(f::LiteralFunction)(Dt::Differential) = f(Dt[1:end-1]) + D(f)(Dt[1:end-1])*Dt[end]

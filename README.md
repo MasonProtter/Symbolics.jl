@@ -44,6 +44,11 @@ julia> (D^3)(f+g)(x)
 ```julia
 julia> x = LiteralFunction(:x);
 
+julia> @syms t
+
+julia> x(t)
+x(t)
+
 julia> D(x)(t)
 D(x)(t)
 ```

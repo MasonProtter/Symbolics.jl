@@ -6,7 +6,7 @@ Examples of use:
 
 1) Basic algebra
 ```julia
-julia> @syms x y z;
+julia> @syms x y z t;
 
 julia> x^2 + x^2
 2 * x ^ 2
@@ -43,8 +43,6 @@ julia> (D^3)(f+g)(x)
 4) Literal functions
 ```julia
 julia> x = LiteralFunction(:x);
-
-julia> @syms t
 
 julia> x(t)
 x(t)

@@ -40,6 +40,8 @@ julia> (D^3)(f+g)(x)
 6
 ```
 
+The derivative operator, `D` is of type `Dtype <: Operator <: Function`. The reason for this is because operations on functions should sometimes behave differently than operations on differential operators. Currently the only difference is in exponentiation, such that `:^(f::Function, n) = x -> f(x)^n` whereas `:^(o::Operator,n::Integer) = x -> o(o( ... o(x)))` where the operator `o` has been applied to `x` `n` times.
+
 4) Literal functions
 ```julia
 julia> x = LiteralFunction(:x);

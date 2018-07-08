@@ -1,6 +1,8 @@
 # Symbolics.jl
 
-This is a package I'm throwing together after getting inspired by the talk [Physics in Clojure](https://www.youtube.com/watch?v=7PoajCqNKpg) which was about porting scmutils, a Scheme package accompanying the book Structure and Insterpretation of Classical Mechanics by Sussman and Wisdom. 
+This is a package I'm throwing together after getting inspired by the talk [Physics in Clojure](https://www.youtube.com/watch?v=7PoajCqNKpg) which was about porting scmutils to clojure. scmutils is a Scheme package with a very interesting and powerful computer algebra system.
+
+My intention here is to attempt to recreate the functionality of scmutils in julia using julian syntax.
 
 Examples of use:
 

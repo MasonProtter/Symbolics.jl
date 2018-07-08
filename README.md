@@ -26,10 +26,13 @@ julia> g(x) = x^2;
 julia> f + g
 (::#70) (generic function with 1 method)
 
-julia> (f+g)(x)
+julia> ans(x)
 x ^ 3 + x ^ 2
 
-julia> (f*g)(x)
+julia> f * g
+(::#72) (generic function with 1 method)
+
+julia> ans(x)
 x ^ 3 * x ^ 2
 ```
 

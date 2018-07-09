@@ -1,3 +1,5 @@
+__precompile__()
+
 module Symbolics
 
 #using MacroTools   

@@ -123,7 +123,7 @@ function collect_identical(ex::SymExpr)
             elseif ex.op == *
                 new_arg = identical_terms[1]^length(identical_terms)
             end
-            SymExpr(+, [new_arg, ex.args[.~(is_dup)]...])
+            SymExpr(ex.op, [new_arg, ex.args[.~(is_dup)]...])
         else
             ex
         end

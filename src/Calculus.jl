@@ -110,4 +110,3 @@ end
 D(f::LiteralFunction) = LiteralFunction(:(D($(f.name))))
 
 (f::LiteralFunction)(Dt::Differential) = f(Dt[1:end-1]) + D(f)(Dt[1:end-1])*Dt[end]
-

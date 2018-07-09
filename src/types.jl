@@ -18,10 +18,6 @@ macro syms(names...)
    esc(out)
 end
 
-Base.:(==)(x::Sym, y::Real) = false
-Base.:(==)(x::Real, y::Sym) = false
-Base.:(==)(x::Sym, y::Sym) = x.name == y.name ? true : false
-
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # SymExprs

@@ -1,108 +1,20 @@
-ex = Union{Sym, SymExpr}
-
+#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
+# Some utility functions
+#----------------------------------------------------------------------------
 walk(x, inner, outer) = outer(x)
 walk(x::SymExpr, inner, outer) = outer(SymExpr(inner(x.op), map(inner, x.args)))
 walk(x::Expr, inner, outer) = outer(Expr(x.head, map(inner, x.args)...))
 postwalk(f, x) = walk(x, x -> postwalk(f, x), f)
 
-
-function expand_expression(expr::SymExpr)
-    postwalk(x -> expand_term(x), expr)
+function Base.vcat(ex::SymExpr, args::Array{T,1}) where {T}
+    SymExpr(ex.op, vcat(ex.args, args))
 end
 
-
-expand_expression(a::Union{Number, Sym}) = a
-
-function simplification_loop(expr::SymExpr)
-    out1 = walk_expand_unravel(expr)
-    out2 = walk_expand_unravel(out1)
-    while (out2 isa SymExpr) && (out1 isa SymExpr) && (out2.args != out1.args)
-        out1 = walk_expand_unravel(out2)
-        out2 = walk_expand_unravel(out1)
-    end
-    out2
+function trim(ex::SymExpr, index::Int)
+    SymExpr(ex.op, ex.args[1:end .!= index])
 end
-
-simplification_loop(a::Union{Number, Sym}) = a
-
-function walk_expand_unravel(expr::SymExpr)
-    postwalk(x -> expand_term(x), expr)
-end
-walk_expand_unravel(a::Sym) = a
-walk_expand_unravel(num::Number) = num
-
-
-function unravel_brackets(expr::SymExpr)
-    if expr.op == +
-        for i in 1:length(expr.args)
-            if (typeof(expr.args[i]) == SymExpr) && (length(expr.args[i].args) >= 2) && ((expr.args[i]).op == +)
-                x = expr.args[i]
-                fn = x.op
-                deleteat!(expr.args, i)
-                for j in 1:length(x.args)
-                    insert!(expr.args, 1, j== 1 ? (x.args[j]) : fn(x.args[j]))
-                end
-            end
-        end
-    end
-    if expr.op == *
-        for i in 1:length(expr.args)
-            if (typeof(expr.args[i]) == SymExpr) && (length(expr.args[i].args) >= 2) && ((expr.args[i]).op == *)
-                x = expr.args[i]
-                fn = x.op
-                deleteat!(expr.args, i)
-                for j in 1:length(x.args)
-                    insert!(expr.args, 1, x.args[j])
-                end
-            end
-        end
-    end
-    SymExpr(expr)
-end
-unravel_brackets(a::Union{Number, Sym}) = a
-
-
-function expand_term(expr::SymExpr)
-    expr |> apply_algebraic_rules
-end
-expand_term(a::Union{Sym, Number, Symbol, Function}) = a
-
-
-
-function apply_algebraic_rules(expr::SymExpr)
-    @> expr begin
-        distribute_negation
-        negate
-        unravel_brackets
-        collect_numeric
-        collect_identical
-        expt_one
-        apply_mult_zero
-        remove_identity_operations
-        evaluate_numeric
-        pos_x_equals_x
-    end
-end
-
-
-function distribute_negation(expr::ex)
-    @capture(expr |> Expr, -(+(x__))) && (expr = +([-x[i] for i in 1:length(x)]...))
-    SymExpr(expr)
-end
-
-function negate(expr::ex)
-    @capture(Expr(expr), -x_) && (expr = -1*x)
-    SymExpr(expr)
-end
-
-function pos_x_equals_x(expr::ex)
-    if (typeof(expr) == SymExpr) && (expr.op == :+) && (length(expr.args) == 1)
-        expr = expr.args[1]
-    end
-    expr
-end
-pos_x_equals_x(num::Number) = num
-
 
 function find_first_duplicates(a::Array)
     for i in 1:(length(a)-1)
@@ -119,113 +31,144 @@ function find_first_duplicates(a::Array)
     []
 end
 
+#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
+# The main loop for recursively going through a symbolic expression and simplifying it
+#----------------------------------------------------------------------------
 
-function collect_identical(expr::SymExpr)
-    f = expr.op
-    body = expr.args
-    duplicate_indices = find_first_duplicates(body)
-    multiplicity = length(duplicate_indices)
-    if (f == +) && (multiplicity > 0)
-        x = body[duplicate_indices[1]]
-        deleteat!(body, duplicate_indices)
-        insert!(body, duplicate_indices[1], multiplicity*x)
-        if length(body) == 1
-            expr = body[1]
-        else
-            expr = SymExpr(f, body)
-        end
+simplify(x::Union{Sym, Number}) = x
+
+function simplify(ex::SymExpr)
+    out1 = simplify_pass(ex)
+    out2 = simplify_pass(out1)
+    while (out2 isa SymExpr) && (out1 isa SymExpr) && (out2 != out1)
+        out1 = simplify_pass(out2)
+        out2 = simplify_pass(out1)
     end
-    if (expr.args[1] == *) && (multiplicity > 0)
-        x = body[duplicate_indices[1]]
-        deleteat!(body, duplicate_indices)
-        insert!(body, duplicate_indices[1], x^multiplicity)
-        if length(body) == 1
-            expr = body[1]
-        else
-            expr = SymExpr(f, body)
-        end
-    end
-    expr
+    out2
 end
 
-collect_identical(a::Union{Number,Sym}) = a
+simplify_pass(x::Union{Number, Sym}) = x
+function simplify_pass(ex::SymExpr)
+    postwalk(apply_algebraic_rules, ex)
+end
+
+apply_algebraic_rules(x::Union{Number, Function, Sym}) = x
+function apply_algebraic_rules(expr::SymExpr)
+    @> expr begin
+        distribute_negation
+        denest
+        collect_numeric_terms
+        collect_identical
+        mult_zero
+        remove_identity_operations
+    end
+end
+
+#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
+# The simplification functions
+#----------------------------------------------------------------------------
+
+function distribute_negation(ex::SymExpr)
+    @(Match.match) ex begin
+        SymExpr(-, [SymExpr(+, args)]) => (out = SymExpr(+, -args))
+        _                              => (out = ex)
+    end
+    out
+end
 
 
-function collect_numeric(expr::SymExpr)
-    f = expr.op
-    if length(expr.args) > 2
-        body = expr.args
-        if (f == +) || (f == *)
-            indices = find(x -> x isa Number, body)
-            if length(indices) > 1
-                numbers = body[indices]
-                deleteat!(body, indices)
-                insert!(body, 1, eval(f)(numbers...))
-                expr = SymExpr(f, body)
-            end
+function denest(ex::SymExpr)
+    (ex.op in [+, *]) ? denest_op(ex, ex.op) : ex
+end
+
+function denest_op(ex, op)
+    for arg in ex.args
+        if (arg isa SymExpr) && (arg.op == op)
+            ii = find(ex.args .== arg)[1]
+            return SymExpr(op, vcat(ex.args[1:end .!= ii], arg.args))
         end
     end
-    SymExpr(expr)
+    ex
 end
-collect_numeric(a::Union{Number, Sym}) = a
 
-function expt_one(expr::ex)
-    if expr.op == (^) && expr.args[2] == 1
-        expr.args[1]
+
+function collect_numeric_terms(ex::SymExpr)
+    if (ex.op in [+, *]) && (length(ex.args) > 2)
+        is_numeric = isa.(ex.args, Number)
+        numbers = ex.args[is_numeric]
+        if length(numbers) > 1
+            new_arg = ex.op(numbers...)
+            SymExpr(ex.op, [new_arg, ex.args[.~(is_numeric)]...])
+        else
+            ex
+        end
     else
-        expr
+        ex
     end
 end
-expt_one(num::Number) = num
 
-function apply_mult_zero(expr::ex)
-    if (typeof(expr) == SymExpr) && (expr.op == *)
-        if length(find(x -> x == 0, expr.args)) > 0
-            expr = 0
+
+function collect_identical(ex::SymExpr)
+    if (ex.op in [+, *]) && (length(ex.args) > 2)
+        dup_inds = find_first_duplicates(ex.args)
+        is_dup = [(i in dup_inds) for i in 1:length(ex.args)]
+        identical_terms = ex.args[is_dup]
+        if length(identical_terms) > 1
+            if ex.op == +
+                new_arg = length(identical_terms)*identical_terms[1]
+            elseif ex.op == *
+                new_arg = identical_terms[1]^length(identical_terms)
+            end
+            SymExpr(+, [new_arg, ex.args[.~(is_dup)]...])
+        else
+            ex
+        end
+    else
+        ex
+    end
+end
+
+
+
+function mult_zero(expr::SymExpr)
+    if expr.op == *
+        if length(find(0 .== expr.args)) > 0
+            return 0
         end
     end
     expr
 end
-apply_mult_zero(num::Number) = num
+mult_zero(x::Union{Sym,Number}) = x
+
 
 function remove_identity_operations(expr::SymExpr)
-    if expr.op == +
-        lst = find(x -> x == 0 , expr.args)
-        if length(lst) > 0
-            deleteat!(expr.args, lst[1])
+    if (expr.op == (^)) && (expr.args[2] == 1)
+        return expr.args[1]
+        
+    elseif expr.op == +
+        lst = find(0 .== expr.args)
+        if (length(expr.args) == 2) && (length(lst) > 0)
+            return expr.args[1:end .!= lst[1]]
+        elseif length(lst) > 0
+            return SymExpr(+, expr.args[1:end .!= lst[1]])
         end
-    elseif expr.args[1] == *
-        lst = find(x -> x == 1 , expr.args)
-        if (length(expr.args) == 2) && (length(find(x -> (x != 1), expr.args)) == 1)
-            return expr.args[find(x -> (x != 1), expr.args)...]
-        end
-        if (length(lst) > 0)
-            deleteat!(expr.args, lst[1])
+        
+    elseif expr.op == *
+        lst = find(1 .== expr.args)
+        if (length(expr.args) == 2) && (length(lst) > 0)
+            return expr.args[1:end .!= lst[1]]
+        elseif length(lst) > 0
+            return SymExpr(*, expr.args[1:end .!= lst[1]])
         end
     end
     expr
 end
-remove_identity_operations(sym::Sym) = sym
-remove_identity_operations(num::Number) = num
+remove_identity_operations(x::Union{Sym,Number}) = x
 
 
-function evaluate_numeric(expr::SymExpr)
-    if (expr.args[1:end] |> is_all_numbers)
-        eval(expr)
-    else
-        expr
-    end
-end
-evaluate_numeric(sym::Sym) = sym
-evaluate_numeric(num::Number) = num
 
-
-function is_all_numbers(list::Array)
-    for n in list
-        if !(typeof(n) <: Number)
-            return false
-        end
-    end
-    true
-end
-
+    

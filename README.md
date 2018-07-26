@@ -2,22 +2,28 @@
 
 This is a package I'm throwing together after getting inspired by the talk [Physics in Clojure](https://www.youtube.com/watch?v=7PoajCqNKpg) which was about porting scmutils to clojure. scmutils is a Scheme package with a very interesting and powerful computer algebra system.
 
-My intention here is to attempt to recreate the functionality of scmutils in julia using julian syntax.
+My intention here is to attempt to recreate the functionality of scmutils in julia using julian syntax. The package is slowly morphing into some sort of hybrid between scmutils and Mathematica.
 
 Examples of use:
 
 1) Basic algebra
 ```julia
-julia> @syms x y z t;
+julia> @sym x y z t;
 
 julia> x^2 + x^2
 2 * x ^ 2
-
-julia> x^2 - x^2
-0
 ```
 
-2) functional composition
+2) You can replace symbols in expressions
+```julia
+julia> ex = x^2 + y^2
+x ^ 2 + y ^ 2
+
+julia> ex(x => 2x + y)
+(2 * x + y) ^ 2 + y ^ 2
+```
+
+3) functional composition
 ```julia
 julia> f(x) = x^3;
 
@@ -36,7 +42,7 @@ julia> ans(x)
 x ^ 3 * x ^ 2
 ```
 
-3) (Automatic) symbolic differentiation, now with higher derivatives and no pertubration confusion!
+4) (Automatic) symbolic differentiation, now with higher derivatives and no pertubration confusion!
 ```julia
 julia> D(f+g)(x)
 3 * x ^ 2 + 2x
@@ -50,15 +56,10 @@ julia> (D^3)(f+g)(x)
 
 The derivative operator, `D` is of type `Dtype <: Operator <: Function`. The reason for this is because operations on functions should sometimes behave differently than operations on differential operators. Currently the only difference is in exponentiation, such that `:^(f::Function, n) = x -> f(x)^n` whereas `:^(o::Operator,n::Integer) = x -> o(o( ... o(x)))` where the operator `o` has been applied to `x` `n` times.
 
-4) Literal functions
+5) Symbolic expressions are callable and can be differentiated
 ```julia
-julia> x = LiteralFunction(:x);
-
-julia> x(t)
-x(t)
-
-julia> D(x)(t)
-D(x)(t)
+julia> D(x(t)^2 + 2x(t), t)
+2 * (x)(t) * (D(x))(t) + 2 * (D(x))(t)
 ```
 
 # Near term targets

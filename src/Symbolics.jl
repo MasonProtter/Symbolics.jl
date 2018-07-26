@@ -3,7 +3,6 @@ __precompile__()
 module Symbolics
 
 using LinearAlgebra
-using MacroTools   
 import Lazy: @>
 # using ForwardDiff
 using DataStructures

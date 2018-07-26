@@ -2,18 +2,18 @@
 #---------------------------------------------------------------
 # Addition of Differentials
 
-function Base.:+(x::Differential, y::Mathy)
+function Base.:+(x::Differential, y::Number)
     x + Differential([DTag()], [y])
 end
 
-function Base.:+(x::Mathy, y::Differential)
+function Base.:+(x::Number, y::Differential)
     Differential([DTag()], [x]) + y
 end
 
 
 function Base.:+(x::Differential, y::Differential)
     tags = tagUnion(x,y)
-    values = [((try x[tag] catch 0 end) + (try y[tag] catch 0 end)) for tag in tags]
+    values = [((try x[tag] catch; 0 end) + (try y[tag] catch; 0 end)) for tag in tags]
     Differential(tags, values)
 end
 
@@ -21,11 +21,11 @@ end
 #---------------------------------------------------------------
 # Multiplication of Differentials
 
-function Base.:*(x::Differential, y::Mathy)
+function Base.:*(x::Differential, y::Number)
     Differential(tag => value * y for (tag, value) in x.terms)
 end
 
-function Base.:*(y::Mathy, x::Differential)
+function Base.:*(y::Number, x::Differential)
     Differential(tag => y * value for (tag, value) in x.terms)
 end
 
@@ -63,21 +63,21 @@ function binaryOp(f::Function, Dfx::Function, Dfy::Function)
     end
 end
 
-Base.:-(Dx::Differential, y::Mathy) = unaryOp(x -> x - y, x -> 1)(Dx)
-Base.:-(x::Mathy, Dy::Differential) = unaryOp(y -> x - y, y -> -1)(Dy)
+Base.:-(Dx::Differential, y::Number) = unaryOp(x -> x - y, x -> 1)(Dx)
+Base.:-(x::Number, Dy::Differential) = unaryOp(y -> x - y, y -> -1)(Dy)
 Base.:-(Dx::Differential, Dy::Differential) = binaryOp((x,y) -> x - y,
                                                        (x,y) -> 1,
                                                        (x,y) -> -1)(Dx,Dy)
 
-Base.:/(Dx::Differential,y::Mathy) = unaryOp(Dx -> Dx/y, Dx -> 1/y)(Dx)
-Base.:/(x::Mathy,Dy::Differential) = unaryOp(Dy -> x/Dy, Dy -> -1/(Dy)^2)(Dy)
+Base.:/(Dx::Differential,y::Number) = unaryOp(Dx -> Dx/y, Dx -> 1/y)(Dx)
+Base.:/(x::Number,Dy::Differential) = unaryOp(Dy -> x/Dy, Dy -> -1/(Dy)^2)(Dy)
 Base.:/(Dx::Differential,Dy::Differential) = binaryOp((x,y) -> x/y,
                                                       (x,y) -> 1/y,
                                                       (x,y) -> -x/y^2)(Dx,Dy)
 
-Base.:^(Dx::Differential,y::Mathy) = unaryOp(Dx -> Dx^y, Dx -> y*Dx^(y-1))(Dx)
+Base.:^(Dx::Differential,y::Number) = unaryOp(Dx -> Dx^y, Dx -> y*Dx^(y-1))(Dx)
 Base.:^(Dx::Differential,y::Int) = unaryOp(Dx -> Dx^y, Dx -> y*Dx^(y-1))(Dx)
-Base.:^(x::Mathy,Dy::Differential) = unaryOp(Dy -> x^Dy, Dy -> log(x)*x^Dy)(Dy)
+Base.:^(x::Number,Dy::Differential) = unaryOp(Dy -> x^Dy, Dy -> log(x)*x^Dy)(Dy)
 
 Base.log(Dx::Differential) = unaryOp(log, x -> 1/x)(Dx)
 
@@ -100,13 +100,19 @@ function extractDiff(Dx::Differential, ϵ::Differential)
         out
     end
 end
-extractDiff(ex::Expr, ϵ::Differential) = 0
+extractDiff(ex::Symbolic, ϵ::Differential) = 0
 
 function D(f::Function)
     ϵ = makeDiff()
     x -> extractDiff(f(x + ϵ), ϵ)
 end
 
-D(f::LiteralFunction) = LiteralFunction(:(D($(f.name))))
+D(f::T) where{T<:AbstractSym} = promote(T)(:D, [f])
+(f::Sym)(Dt::Differential) = f(Dt[1:end-1]) + D(f)(Dt[1:end-1])*Dt[end]
 
-(f::LiteralFunction)(Dt::Differential) = f(Dt[1:end-1]) + D(f)(Dt[1:end-1])*Dt[end]
+
+function D(ex::Symbolic, s::AbstractSym)
+    ϵ = makeDiff()
+    Dex = ex(s => s + ϵ) |> Expr |> eval
+    extractDiff(Dex, ϵ)
+end

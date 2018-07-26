@@ -1,15 +1,19 @@
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # Syms
-@auto_hash_equals struct Sym
+abstract type Symbolic <: Number  end
+abstract type AbstractSym <: Symbolic end 
+
+struct Sym <: AbstractSym
     name::Symbol
 end
+Sym(s::AbstractString) = Sym(Symbol(s))
 
 function Base.show(io::IO, symbol::Sym)
     print(io, symbol.name)
 end
 
-macro syms(names...)
+macro sym(names...)
     out = Expr(:block)
     for name in names
         v = Sym(name)
@@ -18,69 +22,80 @@ macro syms(names...)
    esc(out)
 end
 
+function Base.:(==)(x::AbstractSym, y::AbstractSym)
+    (typeof(x) == typeof(y)) && (x.name == y.name)
+end
+
+Base.:(==)(x::AbstractSym, y::Number) = false
+Base.:(==)(x::Number, y::AbstractSym) = false
+Base.:(==)(x::AbstractSym, y) = false
+Base.:(==)(x, y::AbstractSym) = false
+
+Base.:(==)(x::AbstractSym, y::Symbol) = x.name == y
+Base.:(==)(x::Symbol, y::AbstractSym) = x == y.name
+
+
+Base.eval(a::AbstractSym) = eval(a.name)
+Base.Symbol(s::AbstractSym) = s.name
+
+(f::Sym)(t) = SymExpr(f, [t])
+(f::Sym)(args...) = SymExpr(f, [args...])
+
+
+
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # SymExprs
-struct SymExpr
-    op::Union{Function, Symbol, Expr, Sym, SymExpr}
+abstract type AbstractSymExpr <: Symbolic end 
+struct SymExpr <: AbstractSymExpr
+    op::Symbolic
     args::Vector
 end
 
-function Base.:(==)(x::SymExpr,y::SymExpr)
-    x.op == y.op && length(x.args) == length(y.args) && all(isequal.(x.args,y.args))
+function Base.:(==)(x::AbstractSymExpr,y::AbstractSymExpr)
+    (x.op == y.op) && (length(x.args) == length(y.args)) && all(isequal.(x.args,y.args))
 end
 
-Base.:(==)(x::SymExpr,y::Number) = false
-Base.:(==)(x::Number,y::SymExpr) = false
-Base.:(==)(x::SymExpr,y::Void) = false
-Base.:(==)(x::Void,y::SymExpr) = false
-Base.:(==)(x::Sym,y::SymExpr) = y == SymExpr(identity,x)
-Base.:(==)(x::SymExpr,y::Sym) = x == SymExpr(identity,y)
+Base.:(==)(x::AbstractSymExpr, y) = false
+Base.:(==)(x, y::AbstractSymExpr) = false
+Base.:(==)(x::AbstractSymExpr, y::Number) = false
+Base.:(==)(x::Number, y::AbstractSymExpr) = false
+Base.:(==)(x::Sym, y::SymExpr) = false
+Base.:(==)(x::SymExpr, y::Sym) = false
 
-SymExpr(x::Expr) = SymExpr(eval(x.args[1]), x.args[2:end])
+
+SymExpr(x::Expr) = SymExpr(Sym(x.args[1]), x.args[2:end])
 SymExpr(x::SymExpr) = x
-SymExpr(f::Function, arg::Union{Sym, Number}) = SymExpr(f, [arg])
-SymExpr(f::Sym, arg::Union{Sym, Number}) = SymExpr(eval(f.name), [arg])
-SymExpr(x::Vector) = SymExpr(x[1], x[2:end])
-SymExpr(f::Sym, args::Vector) = SymExpr(eval(f.name), args)
-
-Base.Expr(x::SymExpr) = Expr(:call, Symbol(x.op), [i isa SymExpr ? Expr(i) :
-                                                   i isa Sym ? i.name :
-                                                   i
-                                                   for i in x.args]...)
-
-Base.show(io::IO,x::SymExpr) = print(io,string(Expr(x)))
-
-Base.eval(a::SymExpr) = eval(Expr(a))
-
-# function to_Expr(a::SymExpr)
-#     Expr(a.head, [i isa SymExpr ? to_Expr(i) :
-#                   i isa Sym ? i.name :
-#                   i for i in a.args]...)
-# end
-
-# function Base.show(io::IO, symexpr::SymExpr)
-#     print(io, string(symexpr.expr))
-# end
+SymExpr(s::Symbol, args::Vector) = SymExpr(Sym(s), args)
 
 
+function convert_for_expr(ex::AbstractSymExpr)
+    if (ex.op == identity) && (ex.args |> length == 1)
+        ex.args[1]
+    else
+        Expr(ex)
+    end
+end
+function convert_for_expr(ex::AbstractSym)
+    try
+        eval(ex.name)
+        ex.name
+    catch e
+        ex
+    end
+end
+convert_for_expr(x) = x
 
-
-Mathy = Union{Number, Sym, SymExpr}
-
-#---------------------------------------------------------------
-#---------------------------------------------------------------
-# Literal Functions
-
-struct LiteralFunction <: Function
-    name::Union{Expr, Symbol, Sym}
+function Base.Expr(x::AbstractSymExpr)
+    Expr(:call, convert_for_expr(x.op), [convert_for_expr(i) for i in x.args]...)
 end
 
-function Base.show(io::IO, f::LiteralFunction)
-    print(io, f.name)
-end
+Base.show(io::IO,x::AbstractSymExpr) = print(io,string(Expr(x)))
 
-(f::LiteralFunction)(t) = SymExpr(f.name, [t])
+Base.eval(a::AbstractSymExpr) = eval(Expr(a))
+
+(f::SymExpr)(t) = SymExpr(f, [t])
+(f::SymExpr)(args...) = SymExpr(f, [args...])
 
 #---------------------------------------------------------------
 #---------------------------------------------------------------
@@ -138,7 +153,7 @@ const ∂ = Dtype()
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # Differential Tags
-type DTag
+mutable struct DTag
     tag::Array
 end
 
@@ -187,7 +202,7 @@ t2 = DTag([1])
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # Differentials
-type Differential
+mutable struct Differential
     terms::SortedDict
 end
 
@@ -214,19 +229,18 @@ function Base.show(io::IO, diff::Differential)
 end
 
 function Differential(iterable)
-    Differential(try delete!(SortedDict(iterable),DTag(-1)) catch SortedDict(iterable) end)
+    Differential(try delete!(SortedDict(iterable),DTag(-1)) catch; SortedDict(iterable) end)
 end
 
 function Differential(keys::Union{Array,Tuple}, values::Union{Array,Tuple})
-    Differential(try delete!(SortedDict(zip(keys,values)), DTag(-1)) catch SortedDict(zip(keys,values)) end)
+    Differential(try delete!(SortedDict(zip(keys,values)), DTag(-1)) catch; SortedDict(zip(keys,values)) end)
 end
 
 Base.length(t::Differential) = length(t.terms)
 Base.:(==)(x::Differential,y::Differential) = x.terms == y.terms
-Base.getindex(t::Differential, i::DTag) = (t.terms)[i]
+Base.getindex(Dx::Differential, i::DTag) = Dx.terms[i]
 getTagList(Dx::Differential) = [key for (key, _) in Dx.terms]
 
-Base.getindex(Dx::Differential, i::DTag) = Dx.terms[i]
 
 function Base.getindex(Dx::Differential, i::Int)
     key = getTagList(Dx)[i]
@@ -242,7 +256,7 @@ function Base.getindex(Dx::Differential, i::UnitRange)
     end
 end
 
-Base.endof(Dx::Differential) = length(Dx |> getTagList)
+Base.lastindex(Dx::Differential) = length(Dx |> getTagList)
 
 lastTag(Dx::Differential) = getTagList(Dx)[end]
 

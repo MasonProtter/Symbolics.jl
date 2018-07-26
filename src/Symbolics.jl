@@ -2,21 +2,23 @@ __precompile__()
 
 module Symbolics
 
-#using MacroTools   
-using Lazy
+using LinearAlgebra
+using MacroTools   
+import Lazy: @>
 # using ForwardDiff
-using AutoHashEquals
 using DataStructures
-using Match
+# using Match
+
 
 include("types.jl")
 # include("UpDownTuples.jl")
-include("Symbolic_Dispatch.jl")
+include("Utils.jl")
+include("SymbolicAlgebra.jl")
 include("Simplification.jl")
 include("Calculus.jl")
-include("FunctionalDispatch.jl")
+include("FunctionAlgebra.jl")
 
 
-export D, ∂, simplify, Sym, @syms, LiteralFunction, UpTuple, SymExpr
+export Sym, SymExpr, AbstractSym, AbstractSymExpr, @sym, Symbolic, D, ∂, simplify, UpTuple
 
 end

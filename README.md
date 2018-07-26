@@ -4,6 +4,11 @@ This is a package I'm throwing together after getting inspired by the talk [Phys
 
 My intention here is to attempt to recreate the functionality of scmutils in julia using julian syntax. The package is slowly morphing into some sort of hybrid between scmutils and Mathematica.
 
+Currently only works on 0.7. To download,
+```julia
+(v0.7) pkg> add git@github.com:MasonProtter/Symbolics.jl.git
+```
+
 Examples of use:
 
 1) Basic algebra

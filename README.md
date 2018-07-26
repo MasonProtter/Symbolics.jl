@@ -101,9 +101,7 @@ m*(D^2)(x)(t) - m*ω^2*x(t)
 
 In order to do this, the main things that I need to do (that I'm aware of) are:
 
-* Fix my simplification alogirthm. There is a function `simplification_loop` which is currently exported but is not always working correctly. Its a mess and I should probably scrap it and reimplement it better.
-
 * Properly implement UpTuples (as well as DownTuples and matrices while I'm at it) 
 
-* Find a clean way to implement partial derivative operators. I keep thinking about this one and then being unsatisfied with and giving up. 
+* Find a clean way to implement partial derivative operators. I keep thinking about this one and then being unsatisfied with my solution and giving up. 
 

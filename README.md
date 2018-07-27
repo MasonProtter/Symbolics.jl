@@ -21,11 +21,11 @@ julia> x^2 + x^2
 
 2) You can replace symbols in expressions
 ```julia
-julia> ex = x^2 + y^2
-x ^ 2 + y ^ 2
+julia> ex = 2x + x^2
+2x + x^2
 
-julia> ex(x => 2x + y)
-(2 * x + y) ^ 2 + y ^ 2
+julia> ex(x => y)
+2y + y^2
 ```
 
 3) functional composition

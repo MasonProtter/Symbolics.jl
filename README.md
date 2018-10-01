@@ -99,7 +99,7 @@ where `∂(3)` means partial derivative with respect to velocity (ie. the third 
 julia> Lagrange_Equations(L)(x)(t)
 (D(D(x)))(t) * m + (x)(t) * m * ω ^ 2
 ```
-which when set equal to zero is the equation of motion for a simple harmonic oscillator, generated in pur Julia code code symbolically!
+which when set equal to zero is the equation of motion for a simple harmonic oscillator, generated in pure Julia code code symbolically!
 
 
 

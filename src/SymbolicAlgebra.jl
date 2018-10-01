@@ -1,3 +1,4 @@
+# [[file:~/Documents/Julia/scrap.org::*SymbolicAlgebra.jl][SymbolicAlgebra.jl:1]]
 #_____________________________________________
 # Promotion Rules
 
@@ -18,10 +19,8 @@ Base.:+(x::Symbolic) = x |> simplify
 
 #_____________________________________________
 # Subtraction
-Base.:(-)(x::T, y::T) where {T<:Symbolic} = promote(T)(:-, stripiden.([x, y])) |> simplify
-Base.:(-)(x::T) where {T<:Symbolic} = exprform(T)(:-, [x]) |> simplify
-Base.:-(x::T) where {T<:AbstractSymExpr} = ((x.op == :- && length(x.args) == 1) ? x.args[1] :
-                                                                                  T(:-, [x])) |> simplify
+Base.:(-)(x::T, y::T) where {T<:Symbolic} = promote(T)(:+, stripiden.([x, -y])) |> simplify
+Base.:(-)(x::T) where {T<:Symbolic} = promote(T)(:*, [-1, x]) |> simplify
 
 
 #_____________________________________________
@@ -54,4 +53,4 @@ Base.log(x::T) where {T<:Symbolic} = promote(T)(:log, stripiden.([x])) |> simpli
 Base.cos(x::T) where {T<:Symbolic} = promote(T)(:cos, stripiden.([x])) |> simplify
 Base.sin(x::T) where {T<:Symbolic} = promote(T)(:sin, stripiden.([x])) |> simplify
 Base.tan(x::T) where {T<:Symbolic} = promote(T)(:tan, stripiden.([x])) |> simplify
-
+# SymbolicAlgebra.jl:1 ends here

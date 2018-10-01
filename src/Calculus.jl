@@ -1,3 +1,4 @@
+# [[file:~/Documents/Julia/scrap.org::*Calculus.jl][Calculus.jl:1]]
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # Addition of Differentials
@@ -79,6 +80,8 @@ Base.:^(Dx::Differential,y::Number) = unaryOp(Dx -> Dx^y, Dx -> y*Dx^(y-1))(Dx)
 Base.:^(Dx::Differential,y::Int) = unaryOp(Dx -> Dx^y, Dx -> y*Dx^(y-1))(Dx)
 Base.:^(x::Number,Dy::Differential) = unaryOp(Dy -> x^Dy, Dy -> log(x)*x^Dy)(Dy)
 
+Base.exp(Dx::Differential) = unaryOp(exp, exp)(Dx)
+
 Base.log(Dx::Differential) = unaryOp(log, x -> 1/x)(Dx)
 
 
@@ -116,3 +119,13 @@ function D(ex::Symbolic, s::AbstractSym)
     Dex = ex(s => s + ϵ) |> Expr |> eval
     extractDiff(Dex, ϵ)
 end
+
+
+function ∂(i)
+    function (f)
+        ϵ = makeDiff()
+        arg -> extractDiff(f(UpTuple(Tuple(i==j ? arg[j]+ϵ 
+                                                : arg[j] for j in eachindex(arg)))),ϵ)
+    end
+end
+# Calculus.jl:1 ends here

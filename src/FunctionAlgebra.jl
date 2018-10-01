@@ -1,3 +1,4 @@
+# [[file:~/Documents/Julia/scrap.org::*FunctionAlgebra.jl][FunctionAlgebra.jl:1]]
 #_____________________________________________
 # Addition
 
@@ -68,6 +69,7 @@ Base.:/(f::Function, a::Number) = t -> f(t)/a
 
 function Base.:^(a::Operator, b::Integer)
     function (t)
-        foldl((x,y)->a(x),t,1:b)
+        foldl((x,y)->a(x),1:b,init=t)
     end
 end
+# FunctionAlgebra.jl:1 ends here

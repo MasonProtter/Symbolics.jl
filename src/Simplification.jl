@@ -1,5 +1,4 @@
-#----------------------------------------------------------------------------
-#----------------------------------------------------------------------------
+# [[file:~/Documents/Julia/scrap.org::*Simplification.jl][Simplification.jl:1]]
 #----------------------------------------------------------------------------
 # Some utility functions
 #----------------------------------------------------------------------------
@@ -37,9 +36,15 @@ simplify(x) = x
 function simplify(ex::AbstractSymExpr)
     out1 = simplify_pass(ex)
     out2 = simplify_pass(out1)
+    counter = 1
     while (out2 isa SymExpr) && (out1 isa SymExpr) && (out2 != out1)
         out1 = simplify_pass(out2)
         out2 = simplify_pass(out1)
+        counter += 1
+        if counter > 1000
+            @warn "possible infinite loop in simplification rules. Breaking"
+            return out2
+        end 
     end
     out2
 end
@@ -106,6 +111,7 @@ function add_rules(ex::T) where {T<:AbstractSymExpr}
     @> ex begin
         distribute_negation
         remove_addative_identity
+        factor_addition
     end
 end
 
@@ -126,20 +132,52 @@ function distribute_negation(ex::T) where {T<:AbstractSymExpr}
     end
 end
 
+
+factor_addition(ex) = ex
+function factor_addition(ex::T) where {T<:AbstractSymExpr}
+    @match ex begin
+        #SymExpr(:+, [x, SymExpr(:*, [a, x])]) => (a+1)*x
+        SymExpr(:+, [SymExpr(:*, [a,b]), SymExpr(:*, [c,d])]), if b==d end => (a+c)*b
+        SymExpr(:+, [SymExpr(:*, [a,b]), SymExpr(:*, [c,d])]), if b==c end => (a+d)*b
+        SymExpr(:+, [SymExpr(:*, [a,b]), SymExpr(:*, [c,d])]), if a==c end => (b+d)*a
+        SymExpr(:+, [SymExpr(:*, [a,b]), SymExpr(:*, [c,d])]), if a==d end => (b+c)*a
+        SymExpr(:+, [a, SymExpr(:*, [b, c])]), if a==b end                 => (c+1)*a 
+        SymExpr(:+, [a, SymExpr(:*, [b, c])]), if a==c end                 => (b+1)*a
+        _                                                                  => ex
+    end
+end
+        
+    
+
 #----------------------------------------------------------------------------
 # Rules for Multiplication
 #----------------------------------------------------------------------------
 mult_rules(x) = x
 function mult_rules(ex::T) where {T<:AbstractSymExpr}
-    if ex.op == :*
-        if (0 in ex.args)
-            return 0
-        elseif (1 in ex.args)
-            return *(ex.args[ex.args .!= 1]...)
-        end
+    @> ex begin
+        mult_by_zero
+        mult_by_one
     end
-    ex
 end
+
+mult_by_zero(ex) = ex
+function mult_by_zero(ex::T) where {T<:AbstractSymExpr}
+    if (ex.op == Sym(:*)) && (0 in ex.args)
+        0
+    else
+        ex
+    end
+end
+
+mult_by_one(ex) = ex
+function mult_by_one(ex::T) where {T<:AbstractSymExpr}
+    if (ex.op == Sym(:*)) && (1 in ex.args)
+        *(ex.args[ex.args .!= 1]...)
+    else
+        ex
+    end
+end
+
 
 
 #----------------------------------------------------------------------------
@@ -147,7 +185,7 @@ end
 #----------------------------------------------------------------------------
 exp_rules(x) = x
 function exp_rules(ex::T) where {T<:AbstractSymExpr}
-    if ex.op == :^
+    if ex.op == Sym(:^)
         if ex.args[2] == 1
             return ex.args[1]
         elseif ex.args[2] == 0
@@ -164,7 +202,7 @@ end
 #----------------------------------------------------------------------------
 remove_identity_operations(x) = x
 function remove_identity_operations(expr::T) where {T<:AbstractSymExpr}
-    if (expr.op == (:^)) && (expr.args[2] == 1)
+    if (expr.op == Sym(:^)) && (expr.args[2] == 1)
         return expr.args[1]
     elseif expr.op == :+
         if (0 in expr.args)
@@ -266,7 +304,4 @@ end
 #     expr
 # end
 # remove_identity_operations(x::Union{Sym,Number}) = x
-
-
-
-    
+# Simplification.jl:1 ends here

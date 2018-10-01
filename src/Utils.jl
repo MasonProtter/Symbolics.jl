@@ -1,4 +1,4 @@
-
+# [[file:~/Documents/Julia/scrap.org::*Utils.jl][Utils.jl:1]]
 walk(x, inner, outer) = outer(x)
 walk(x::T, inner, outer) where {T<:AbstractSymExpr} = outer(T(inner(x.op), map(inner, x.args)))
 walk(x::Expr, inner, outer) = outer(Expr(x.head, map(inner, x.args)...))
@@ -17,14 +17,4 @@ end
 
 (ex::SymExpr)(p::Pair) = replace_sym(ex, p)
 (ex::Sym)(p::Pair) = replace_sym(ex, p)
-
-
-# function (s)
-#     if s isa Sym
-#         try
-#             eval(s.name) isa Sym ? s(t)
-# (f::SymExpr)(t) = length(f.args == 1) ? SymExpr(f.op, [f.args[1](t)]) : throw("whoops, still fucked!")
-
-                                                
-# (f::SymExpr)(t) = postwalk(s -> s isa Sym ? (eval(s.name) isa Sym ? s(t) : s) : s, f)
-# (f::SymExpr)(args...) = SymExpr(f, [args...])
+# Utils.jl:1 ends here

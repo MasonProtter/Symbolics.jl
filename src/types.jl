@@ -1,3 +1,4 @@
+# [[file:~/Documents/Julia/scrap.org::*types.jl][types.jl:1]]
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # Syms
@@ -104,35 +105,34 @@ Base.eval(a::AbstractSymExpr) = eval(Expr(a))
 abstract type Structure end
 
 struct UpTuple <: Structure
-    data
+    data::Tuple
 end
 
 struct DownTuple <: Structure
-    data
+    data::Tuple
 end
 
 function Base.show(io::IO, up::UpTuple)
-    arr = [(up.data)...]
+    arr = up.data
     print(io, "up($(arr[1])")
     if length(arr) > 1
         for i in arr[2:end]
-            print(io, ", $i")
+            print(io, "\n   $i")
         end
     end
     print(io, ")")
 end
 
-(arr::UpTuple)(t) = up([i(t) for i in arr.data]...)
+function Base.show(io::IO, down::DownTuple)
+    arr = (down.data)
+    print(io, "down$(arr)")
+end
+
+(arr::UpTuple)(t) = UpTuple(Tuple(i(t) for i in arr.data))
+(arr::DownTuple)(t) = DownTuple(Tuple(i(t) for i in arr.data))
 
 up(data...) = UpTuple(data)
-
-Base.start(arr::UpTuple) = start(arr.data)
-Base.done(arr::UpTuple, a::Any) = done(arr.data, a::Any)
-Base.next(arr::UpTuple, a::Any) = next(arr.data, a::Any)
-Base.length(arr::UpTuple) = length(arr.data)
-
-square(arr::UpTuple) = [arr.data...]' * [arr.data...]
-square(a::SymExpr) = a^2
+down(data...) = DownTuple(data)
 
 expand_expression(arr::UpTuple) = up([expand_expression(i) for i in arr.data]...)
 Base.getindex(arr::UpTuple, i::Integer) = getindex(arr.data, i)
@@ -280,3 +280,4 @@ function fastuniq(v)
 end
 
 tagCount = 0
+# types.jl:1 ends here

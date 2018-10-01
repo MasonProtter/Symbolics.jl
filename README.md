@@ -93,8 +93,7 @@ function Lagrange_Equations(L)
     end
 end
 ```
-where `∂(3)` means partial derivative with respect to velocity (ie. the third element of the local tuple and `∂(2)` means partial derivative with respect to position, the second element of the local tuple. Putting this all together, we may execute
-
+where `∂(3)` means partial derivative with respect to velocity and `∂(2)` means partial derivative with respect to position (ie. the third and second elements of the local tuple respectively). Putting this all together, we may execute
 ```julia
 julia> Lagrange_Equations(L)(x)(t)
 (D(D(x)))(t) * m + (x)(t) * m * ω ^ 2

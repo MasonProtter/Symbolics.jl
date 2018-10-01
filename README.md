@@ -9,8 +9,9 @@ This package works on Julia 1.0. To add it, simply
 pkg> add git@github.com:MasonProtter/Symbolics.jl.git
 ```
 
+Note: This package is very much a work in progress! Don't rely on it for *anything* important. 
+
 Examples of use:
-0.7
 1) Basic algebra
 ```julia
 julia > using Symbolics

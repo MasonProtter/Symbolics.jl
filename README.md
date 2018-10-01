@@ -13,6 +13,8 @@ Examples of use:
 0.7
 1) Basic algebra
 ```julia
+julia > using Symbolics
+
 julia> @sym x y z t;
 
 julia> x^2 + x^2
@@ -70,6 +72,8 @@ julia> D(x(t)^2 + 2x(t), t)
 # New: Generate the Euler Lagrange Equations from a Lagrangian
 We can now define a Lagrangian, say that of a simple harmonic oscillator as 
 ```julia
+using Smybolics
+
 @sym x m ω t
 
 function L(local_tuple::UpTuple)

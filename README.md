@@ -4,13 +4,13 @@ This is a package I'm throwing together after getting inspired by the talk [Phys
 
 My intention with Symbolics.jl is to attempt to recreate the functionality of scmutils in julia using julian syntax. The package is slowly morphing into some sort of hybrid between scmutils and Mathematica.
 
-Currently only works on 0.7. To download,
+This package works on Julia 1.0. To add it, simply
 ```
-(v0.7) pkg> add git@github.com:MasonProtter/Symbolics.jl.git
+pkg> add git@github.com:MasonProtter/Symbolics.jl.git
 ```
 
 Examples of use:
-
+0.7
 1) Basic algebra
 ```julia
 julia> @sym x y z t;
@@ -67,41 +67,43 @@ julia> D(x(t)^2 + 2x(t), t)
 2 * (x)(t) * (D(x))(t) + 2 * (D(x))(t)
 ```
 
-# Near term targets
-1) Primarily, I want to be able to run the following code:
+# New: Generate the Euler Lagrange Equations from a Lagrangian
+We can now define a Lagrangian, say that of a simple harmonic oscillator as 
 ```julia
-@syms m, ω, t
-
-function Γ(w)
-    function (t)
-        UpTuple(t, w(t), D(w)(t))
-    end
-end
-
-
-function Lagrange_Equations(L)
-    function (w)
-        D(∂(2)(L)∘Γ(w)) - ∂(1)(L)∘Γ(w)
-    end
-end
+@sym x m ω t
 
 function L(local_tuple::UpTuple)
-    t, q, qdot = local_tuple
-    m/2*qdot^2 - m*ω^2/2*q^2
+    t, q, qdot = local_tuple.data
+   (0.5m)*qdot^2 - (0.5m*ω^2)*q^2
 end
-
-x = LiteralFunction(:x)
-
-Lagrange_Equations(x)(t)
 ```
-and produce
+where the local_tuple is an object describing a time, posisition and velocity (ie. all the relevant phase space data). According to SICM, this data should be provided by a function `Γ(w)` where `w` defines a trajectory through space. `Γ` is defined as
 ```julia
-m*(D^2)(x)(t) - m*ω^2*x(t)
+function Γ(w)
+    function (t)
+        up(t, w(t), D(w)(t))
+    end
+end
 ```
+Hence, as shown in SICM, the Euler-Lagrange condition for stationary action may be written as the functional
+```julia
+function Lagrange_Equations(L)
+    function (w)
+        D(∂(3)(L)∘Γ(w)) - ∂(2)(L)∘Γ(w)
+    end
+end
+```
+where `∂(3)` means partial derivative with respect to velocity (ie. the third element of the local tuple and `∂(2)` means partial derivative with respect to position, the second element of the local tuple. Putting this all together, we may execute
 
-In order to do this, the main things that I need to do (that I'm aware of) are:
+```julia
+julia> Lagrange_Equations(L)(x)(t)
+(D(D(x)))(t) * m + (x)(t) * m * ω ^ 2
+```
+which when set equal to zero is the equation of motion for a simple harmonic oscillator, generated in pur Julia code code symbolically!
 
-* Properly implement UpTuples (as well as DownTuples and matrices while I'm at it) 
 
-* Find a clean way to implement partial derivative operators. I keep thinking about this one and then being unsatisfied with my solution and giving up. 
+
+
+
+
 

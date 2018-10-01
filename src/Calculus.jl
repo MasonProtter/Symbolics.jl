@@ -52,7 +52,7 @@ end
 #---------------------------------------------------------------
 # constructors for new unary and binary operations
 
-function unaryOp(f::Function, Df::Function)
+function unaryOp(f::T, Df::U) where {T<:Union{Function,SymExpr},U<:Union{Function,SymExpr}}
     function (Dx::Differential)
         f(Dx[1:end-1]) + Df(Dx[1:end-1])*Dx[end]
     end
@@ -110,9 +110,9 @@ function D(f::Function)
     x -> extractDiff(f(x + ϵ), ϵ)
 end
 
-D(f::T) where{T<:AbstractSym} = promote(T)(:D, [f])
+D(f::T) where{T<:Symbolic} = promote(T)(:D, [f])
 (f::Sym)(Dt::Differential) = f(Dt[1:end-1]) + D(f)(Dt[1:end-1])*Dt[end]
-
+(ex::SymExpr)(Dx::Differential) = unaryOp(ex, D(ex))(Dx)
 
 function D(ex::Symbolic, s::AbstractSym)
     ϵ = makeDiff()
@@ -127,5 +127,15 @@ function ∂(i)
         arg -> extractDiff(f(UpTuple(Tuple(i==j ? arg[j]+ϵ 
                                                 : arg[j] for j in eachindex(arg)))),ϵ)
     end
+end
+        
+function Base.:*(x::Differential, y::Differential)
+    out = Differential([],[0])
+    for (k1,v1) in x.terms
+        for (k2,v2) in y.terms
+            out += Differential([k1*k2], [v1*v2])
+        end
+    end
+    out
 end
 # Calculus.jl:1 ends here

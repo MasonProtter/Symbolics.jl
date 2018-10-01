@@ -268,6 +268,14 @@ function collect_identical(ex::T) where {T<:AbstractSymExpr}
     end
 end
 
+# eval_numeric(x) = x
+# function eval_numeric(ex::T) where {T<:AbstractSymExpr}
+#     if (ex.args isa Array{U,1} where {U<:Number}) && (try eval(Symbol(ex.op)) isa Function catch e; false end)
+#         eval(Expr(ex))
+#     else
+#         ex
+#     end
+# end
 
 
 # function mult_zero(expr::SymExpr)

@@ -44,8 +44,6 @@ Base.Symbol(s::AbstractSym) = s.name
 (f::Sym)(t) = SymExpr(f, [t])
 (f::Sym)(args...) = SymExpr(f, [args...])
 
-
-
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # SymExprs
@@ -70,7 +68,6 @@ Base.:(==)(x::SymExpr, y::Sym) = false
 SymExpr(x::Expr) = SymExpr(Sym(x.args[1]), x.args[2:end])
 SymExpr(x::SymExpr) = x
 SymExpr(s::Symbol, args::Vector) = SymExpr(Sym(s), args)
-
 
 function convert_for_expr(ex::AbstractSymExpr)
     if (ex.op == identity) && (ex.args |> length == 1)

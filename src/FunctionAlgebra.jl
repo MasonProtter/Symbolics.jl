@@ -47,8 +47,6 @@ function Base.:*(f1::Operator, f2::Operator)
     t -> (f1(f2))(t)
 end
 
-
-
 Base.:*(a::Number, f::Union{Function,Operator}) = t -> a*f(t)
 Base.:*(f::Union{Function,Operator}, a::Number) = *(a, f)
 

@@ -67,7 +67,6 @@ SymExpr(x::Expr) = SymExpr(Sym(x.args[1]), x.args[2:end])
 SymExpr(x::SymExpr) = x
 SymExpr(s::Symbol, args::Vector) = SymExpr(Sym(s), args)
 
-
 function convert_for_expr(ex::AbstractSymExpr)
     if (ex.op == identity) && (ex.args |> length == 1)
         ex.args[1]

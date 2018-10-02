@@ -86,6 +86,10 @@ Base.log(Dx::Differential) = unaryOp(log, x -> 1/x)(Dx)
 
 Base.sqrt(Dx::Differential) = unaryOp(sqrt, x -> 1/(2*sqrt(x)))(Dx)
 
+Base.sin(Dx::Differential) = unaryOp(sin, x -> cos(x))(Dx)
+
+Base.cos(Dx::Differential) = unaryOp(cos, x -> -sin(x))(Dx)
+
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # Derivatives
@@ -125,7 +129,7 @@ end
 function ∂(i)
     function (f)
         ϵ = makeDiff()
-        arg -> extractDiff(f(UpTuple(Tuple(i==j ? arg[j]+ϵ 
+        arg -> extractDiff(f(UpTuple(Tuple(i==j ? arg[j]+ϵ
                                                 : arg[j] for j in eachindex(arg)))),ϵ)
     end
 end

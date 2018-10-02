@@ -57,7 +57,13 @@ end
         (0.5m)*qdot^2
     end
 
+    function L_pendulum(local_tuple::UpTuple)
+        t, q, qdot = local_tuple.data
+        m*qdot^2/2+cos(q)
+    end
+
     @test Lagrange_Equations(L_SHO)(x)(t)  == (D(D(x)))(t) * m + (x)(t) * m * ω ^ 2
     @test Lagrange_Equations(L_free)(x)(t) == (D(D(x)))(t) * m
+    @test Lagrange_Equations(L_pendulum)(x)(t) == (D(D(x)))(t) * m + sin((x)(t))
 end
 # tests:1 ends here

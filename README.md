@@ -1,3 +1,4 @@
+https://travis-ci.com/MasonProtter/Symbolics.jl.svg?branch=master
 # Symbolics.jl
 
 This is a package I'm throwing together after getting inspired by the talk [Physics in Clojure](https://www.youtube.com/watch?v=7PoajCqNKpg) which was about porting scmutils to clojure. scmutils is a Scheme package with a very interesting and powerful computer algebra system meant as a companion to the book [Structure and Interpretation of Classical Mechanics](https://mitpress.mit.edu/books/structure-and-interpretation-classical-mechanics-second-edition).

@@ -160,9 +160,6 @@ mutable struct DTag
     DTag(x) = new([x])
 end
 
-
-
-
 Base.length(t::DTag) = length(t.tag)
 Base.:(==)(x::DTag,y::DTag) = x.tag == y.tag
 Base.getindex(t::DTag, i::Int) = (t.tag)[i]

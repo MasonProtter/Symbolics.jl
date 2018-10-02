@@ -48,7 +48,7 @@ julia> f * g
 (::#72) (generic function with 1 method)
 
 julia> ans(x)
-x ^ 3 * x ^ 2
+x ^ 5
 ```
 
 4) (Automatic) symbolic differentiation, now with higher derivatives and no pertubration confusion!

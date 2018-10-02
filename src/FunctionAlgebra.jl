@@ -61,6 +61,7 @@ function Base.:/(f1::Function, f2::Function)
     end
 end
 
+
 Base.:/(a::Number, f::Function) = t -> a/f(t)
 Base.:/(f::Function, a::Number) = t -> f(t)/a
 

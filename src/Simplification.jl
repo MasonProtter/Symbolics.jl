@@ -1,3 +1,5 @@
+# Simplification.jl
+
 # [[file:~/Documents/Julia/scrap.org::*Simplification.jl][Simplification.jl:1]]
 #----------------------------------------------------------------------------
 # Some utility functions
@@ -92,35 +94,6 @@ end
 # The simplification functions
 #----------------------------------------------------------------------------
 
-
-# addition_rules(x) = x
-# function addition_rules(ex::T) where {T<:AbstractSymExpr}
-#     if ex.op == :+
-#         @> ex begin
-#             remove_addative_identity
-#         end
-#     else
-#         ex
-#     end
-# end
-
-# remove_addative_identity(x) = x
-# function remove_addative_identity(ex::T) where {T<:AbstractSymExpr}
-#     if (0 in expr.args)
-#         return +(expr.args[expr.args .!= 0]...)
-#     end 
-# end
-
-# remove_addative_identity(x) = x
-# function remove_addative_identity(ex::T) where {T<:AbstractSymExpr}
-#     if (0 in expr.args)
-#         return +(expr.args[expr.args .!= 0]...)
-#     end 
-# end
-
-# # collect_over_op(x) = x
-# # function collect_associative_terms(x, op) = x
-
 #----------------------------------------------------------------------------
 # Rules for Addition
 #----------------------------------------------------------------------------
@@ -164,8 +137,6 @@ function factor_addition(ex::T) where {T<:AbstractSymExpr}
         _                                                                  => ex
     end
 end
-
-
 
 
 #----------------------------------------------------------------------------
@@ -223,6 +194,7 @@ function exp_rules(ex::T) where {T<:AbstractSymExpr}
     @> ex begin
         exp_one
         exp_zero
+        exp_exp
     end
 end
 
@@ -241,6 +213,16 @@ function exp_zero(ex::T) where {T<:AbstractSymExpr}
     end
     ex
 end
+
+exp_exp(x) = x
+function exp_exp(ex::T) where {T<:AbstractSymExpr}
+     @match ex begin
+         T(:^, [T(:^, [a,b]), c]) => a^(b*c)
+         _                        => ex
+     end
+end
+         
+         
     
 
 #----------------------------------------------------------------------------
@@ -313,49 +295,4 @@ function collect_identical(ex::T) where {T<:AbstractSymExpr}
         ex
     end
 end
-
-# eval_numeric(x) = x
-# function eval_numeric(ex::T) where {T<:AbstractSymExpr}
-#     if (ex.args isa Array{U,1} where {U<:Number}) && (try eval(Symbol(ex.op)) isa Function catch e; false end)
-#         eval(Expr(ex))
-#     else
-#         ex
-#     end
-# end
-
-
-# function mult_zero(expr::SymExpr)
-#     if expr.op == *
-#         if length(findall(0 .== expr.args)) > 0
-#             return 0
-#         end
-#     end
-#     expr
-# end
-# mult_zero(x::Union{Sym,Number}) = x
-
-
-# function remove_identity_operations(expr::SymExpr)
-#     if (expr.op == (^)) && (expr.args[2] == 1)
-#         return expr.args[1]
-        
-#     elseif expr.op == +
-#         lst = findall(0 .== expr.args)
-#         if (length(expr.args) == 2) && (length(lst) > 0)
-#             return expr.args[1:end .!= lst[1]]
-#         elseif length(lst) > 0
-#             return SymExpr(+, expr.args[1:end .!= lst[1]])
-#         end
-        
-#     elseif expr.op == *
-#         lst = findall(1 .== expr.args)
-#         if (length(expr.args) == 2) && (length(lst) > 0)
-#             return expr.args[1:end .!= lst[1]]
-#         elseif length(lst) > 0
-#             return SymExpr(*, expr.args[1:end .!= lst[1]])
-#         end
-#     end
-#     expr
-# end
-# remove_identity_operations(x::Union{Sym,Number}) = x
 # Simplification.jl:1 ends here

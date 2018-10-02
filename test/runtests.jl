@@ -1,3 +1,5 @@
+# tests
+
 # [[file:~/Documents/Julia/scrap.org::*tests][tests:1]]
 using Symbolics, Test
 
@@ -14,6 +16,8 @@ end
     @test (2x + y) - 8x == -6x + y
     @test x^2 * y * x^-1 == x*y
     @test ((2x + 3)^2 + 4(2x + 3)^2) * (2x + 3)^3 ==  (2 * x + 3)^5 * 5
+    @test x * x^-4 == x^-3
+    @test (x^y)^2/x == x^(y*2 - 1)
 end
 
 @testset "Function Algebra" begin

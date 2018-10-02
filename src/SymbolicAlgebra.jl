@@ -1,3 +1,5 @@
+# SymbolicAlgebra.jl
+
 # [[file:~/Documents/Julia/scrap.org::*SymbolicAlgebra.jl][SymbolicAlgebra.jl:1]]
 #_____________________________________________
 # Promotion Rules
@@ -33,7 +35,7 @@ Base.zero(a::Symbolic) = 0
 
 #_____________________________________________
 # Division
-Base.:(/)(x::T, y::T) where {T<:Symbolic} = (x == y) ? 1 : promote(T)(:*, stripiden.([x, y^-1]))  |> simplify
+Base.:(/)(x::T, y::T) where {T<:Symbolic} = promote(T)(:*, stripiden.([x, y^-1]))  |> simplify
 
 
 #_____________________________________________

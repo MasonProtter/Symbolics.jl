@@ -1,3 +1,5 @@
+# types.jl
+
 # [[file:~/Documents/Julia/scrap.org::*types.jl][types.jl:1]]
 #---------------------------------------------------------------
 #---------------------------------------------------------------
@@ -159,9 +161,6 @@ mutable struct DTag
     DTag(x...) = new([i for i in x] |> sort)
     DTag(x) = new([x])
 end
-
-
-
 
 Base.length(t::DTag) = length(t.tag)
 Base.:(==)(x::DTag,y::DTag) = x.tag == y.tag

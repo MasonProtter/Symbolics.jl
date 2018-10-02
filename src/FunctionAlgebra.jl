@@ -1,3 +1,5 @@
+# FunctionAlgebra.jl
+
 # [[file:~/Documents/Julia/scrap.org::*FunctionAlgebra.jl][FunctionAlgebra.jl:1]]
 #_____________________________________________
 # Addition

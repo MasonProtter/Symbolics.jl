@@ -84,19 +84,11 @@ end
 ```
 where the local_tuple is an object describing a time, posisition and velocity (ie. all the relevant phase space data). According to SICM, this data should be provided by a function `Γ(w)` where `w` defines a trajectory through space. `Γ` is defined as
 ```julia
-function Γ(w)
-    function (t)
-        up(t, w(t), D(w)(t))
-    end
-end
+Γ(w) = t -> UpTuple((t, w(t), D(w)(t)))
 ```
 Hence, as shown in SICM, the Euler-Lagrange condition for stationary action may be written as the functional
 ```julia
-function Lagrange_Equations(L)
-    function (w)
-        D(∂(3)(L)∘Γ(w)) - ∂(2)(L)∘Γ(w)
-    end
-end
+Lagrange_Equations(L) = w -> D(∂(3)(L)∘Γ(w)) - ∂(2)(L)∘Γ(w)
 ```
 where `∂(3)` means partial derivative with respect to velocity and `∂(2)` means partial derivative with respect to position (ie. the third and second elements of the local tuple respectively). Putting this all together, we may execute
 ```julia

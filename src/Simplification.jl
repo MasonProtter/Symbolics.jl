@@ -26,6 +26,24 @@ function find_first_duplicates(a::Array)
     []
 end
 
+
+apply_f_to_pairs(f, x) = x
+function apply_f_to_pairs(f, ex::T) where {T<:AbstractSymExpr}
+    if length(ex.args) == 2
+        return f(ex)
+    elseif length(ex.args) > 2
+        for i in 1:(length(ex.args)-1), j in (i+1):length(ex.args)
+            old_arg = SymExpr(ex.op, [ex.args[i], ex.args[j]])
+            newarg = f(old_arg)
+            if newarg != old_arg
+                newarglist = ex.args[1:end .!= i][1:end .!= j-1] #This should select everything but the i and j components since j>i
+                return SymExpr(ex.op, vcat([newarg], newarglist))
+            end
+        end
+    end
+    ex
+end
+
 #----------------------------------------------------------------------------
 #----------------------------------------------------------------------------
 #----------------------------------------------------------------------------
@@ -111,7 +129,7 @@ function add_rules(ex::T) where {T<:AbstractSymExpr}
     @> ex begin
         distribute_negation
         remove_addative_identity
-        factor_addition
+        ex -> apply_f_to_pairs(factor_addition, ex)
     end
 end
 
@@ -146,8 +164,9 @@ function factor_addition(ex::T) where {T<:AbstractSymExpr}
         _                                                                  => ex
     end
 end
-        
-    
+
+
+
 
 #----------------------------------------------------------------------------
 # Rules for Multiplication
@@ -157,6 +176,7 @@ function mult_rules(ex::T) where {T<:AbstractSymExpr}
     @> ex begin
         mult_by_zero
         mult_by_one
+        x -> apply_f_to_pairs(factor_powers, x)
     end
 end
 
@@ -172,30 +192,56 @@ end
 mult_by_one(ex) = ex
 function mult_by_one(ex::T) where {T<:AbstractSymExpr}
     if (ex.op == Sym(:*)) && (1 in ex.args)
-        *(ex.args[ex.args .!= 1]...)
+        newargs = ex.args[ex.args .!= 1]
+        if newargs == []
+            1
+        else
+            *(newargs...)
+        end
     else
         ex
     end
 end
 
 
+factor_powers(x) = x
+function factor_powers(ex::T) where {T<:AbstractSymExpr}
+    @match ex begin
+        SymExpr(:*, [SymExpr(:^, [a,b]), SymExpr(:^, [c,d])]), if a==c end => a^(b+d)
+        SymExpr(:*, [a, SymExpr(:^, [b,c])]),                  if a==b end => a^(c+1) 
+        SymExpr(:*, [SymExpr(:^, [a,b]), c]),                  if a==c end => a^(b+1) 
+        SymExpr(:*, [a, b]),                                   if a==b end => a^2
+        _                                                                  => ex
+    end
+end
 
 #----------------------------------------------------------------------------
 # Rules for Exponentiation
 #----------------------------------------------------------------------------
 exp_rules(x) = x
 function exp_rules(ex::T) where {T<:AbstractSymExpr}
-    if ex.op == Sym(:^)
-        if ex.args[2] == 1
-            return ex.args[1]
-        elseif ex.args[2] == 0
-            return 1
-        end
+    @> ex begin
+        exp_one
+        exp_zero
+    end
+end
+
+exp_one(x) = x
+function exp_one(ex::T) where {T<:AbstractSymExpr}
+    if (ex.op == Sym(:^)) && (ex.args[2] == 1)
+        return ex.args[1]
     end
     ex
 end
 
-
+exp_zero(x) = x
+function exp_zero(ex::T) where {T<:AbstractSymExpr}
+    if (ex.op == Sym(:^)) && (ex.args[2] == 0)
+        return 1
+    end
+    ex
+end
+    
 
 #----------------------------------------------------------------------------
 # More Misc. Rules

@@ -155,11 +155,13 @@ const ∂ = Dtype()
 # Differential Tags
 mutable struct DTag
     tag::Array
+    DTag(x::Array) = new(x)
+    DTag(x...) = new([i for i in x] |> sort)
+    DTag(x) = new([x])
 end
 
-DTag(x) = DTag([x])
 
-DTag(x...) = DTag([i for i in x] |> sort)
+
 
 Base.length(t::DTag) = length(t.tag)
 Base.:(==)(x::DTag,y::DTag) = x.tag == y.tag
@@ -204,6 +206,9 @@ t2 = DTag([1])
 # Differentials
 mutable struct Differential
     terms::SortedDict
+    function Differential(iterable)
+        new(try delete!(SortedDict(iterable),DTag(-1)) catch; SortedDict(iterable) end)
+    end
 end
 
 function printEpsilons(t::DTag)
@@ -226,10 +231,6 @@ function Base.show(io::IO, diff::Differential)
         end
     end
     print(io, str)
-end
-
-function Differential(iterable)
-    Differential(try delete!(SortedDict(iterable),DTag(-1)) catch; SortedDict(iterable) end)
 end
 
 function Differential(keys::Union{Array,Tuple}, values::Union{Array,Tuple})

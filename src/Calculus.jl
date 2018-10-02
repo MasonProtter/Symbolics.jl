@@ -84,6 +84,7 @@ Base.exp(Dx::Differential) = unaryOp(exp, exp)(Dx)
 
 Base.log(Dx::Differential) = unaryOp(log, x -> 1/x)(Dx)
 
+Base.sqrt(Dx::Differential) = unaryOp(sqrt, x -> 1/(2*sqrt(x)))(Dx)
 
 #---------------------------------------------------------------
 #---------------------------------------------------------------
@@ -127,15 +128,5 @@ function ∂(i)
         arg -> extractDiff(f(UpTuple(Tuple(i==j ? arg[j]+ϵ 
                                                 : arg[j] for j in eachindex(arg)))),ϵ)
     end
-end
-        
-function Base.:*(x::Differential, y::Differential)
-    out = Differential([],[0])
-    for (k1,v1) in x.terms
-        for (k2,v2) in y.terms
-            out += Differential([k1*k2], [v1*v2])
-        end
-    end
-    out
 end
 # Calculus.jl:1 ends here

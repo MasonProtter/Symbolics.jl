@@ -1,5 +1,4 @@
-julia 1.0.0
-Lazy
-DataStructures
-Match
-
+julia 1.0
+Lazy v0.13.1
+DataStructures v0.14.0
+Match v1.0.1

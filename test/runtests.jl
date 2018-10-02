@@ -16,7 +16,7 @@ end
     @test ((2x + 3)^2 + 4(2x + 3)^2) * (2x + 3)^3 ==  (2 * x + 3)^5 * 5
 end
 
-@testset "Fucntion Albegra" begin
+@testset "Function Algebra" begin
     f(x) = x^3
     g(x) = x^2
     @test (f + g)(x) == x ^ 3 + x ^ 2
@@ -24,7 +24,7 @@ end
 end
 
 @testset "Replacements" begin
-    @test (x^2 + 2x)(x => y) == y^2 + 2y 
+    @test (x^2 + 2x)(x => y) == y^2 + 2y
 end
 
 
@@ -57,7 +57,13 @@ end
         (0.5m)*qdot^2
     end
 
+    function L_pendulum(local_tuple::UpTuple)
+        t, q, qdot = local_tuple.data
+        m*qdot^2/2+cos(q)
+    end
+
     @test Lagrange_Equations(L_SHO)(x)(t)  == (D(D(x)))(t) * m + (x)(t) * m * ω ^ 2
     @test Lagrange_Equations(L_free)(x)(t) == (D(D(x)))(t) * m
+    @test Lagrange_Equations(L_pendulum)(x)(t) == (D(D(x)))(t) * m + sin((x)(t))
 end
 # tests:1 ends here

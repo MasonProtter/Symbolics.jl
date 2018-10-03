@@ -5,12 +5,11 @@ using Symbolics, DiffRules, SpecialFunctions, Test
 
 @sym x y z m ω t;
 
-
 @testset "Construction of SymExprs" begin
     @test x(t) == SymExpr(x, [t])
 end
 
-@testset "Algebra" begin
+@testset "                 Algebra" begin
     @test x^2 + x^2 == 2 * x ^ 2
     @test x^2 - x^2 == 0
     @test (2x + y) - 8x == -6x + y
@@ -20,19 +19,19 @@ end
     @test (x^y)^2/x == x^(y*2 - 1)
 end
 
-@testset "Function Algebra" begin
+@testset "        Function Algebra" begin
     f(x) = x^3
     g(x) = x^2
     @test (f + g)(x) == x ^ 3 + x ^ 2
     @test (f * g)(x) == x ^ 3 * x ^ 2
 end
 
-@testset "Replacements" begin
+@testset "            Replacements" begin
     @test (x^2 + 2x)(x => y) == y^2 + 2y
 end
 
 
-@testset "Derivatives" begin
+@testset "             Derivatives" begin
     f(x) = x^3
     g(x) = x^2
     @test D(f+g)(x) |> simplify == 3 * x ^ 2 + 2x
@@ -47,17 +46,17 @@ end
             @eval begin
                 @test D($M.$f)(x) == $deriv
             end
-        elseif arity == 2 && (M == :Base || M == :SpecialFunctions) && f ∉ [:+, :-, :*, :/]
-            deriv = DiffRules.diffrule(M, f, :x, :y)
-            @eval begin
-                @test D($M.$f)(x, y) == $deriv
-                # $M.$f(Dx::Differential, Dy::Differential) = binaryOp($f, (x, y)->$deriv)(Dx, Dy)
-            end
+        # elseif arity == 2 && (M == :Base || M == :SpecialFunctions) && f ∉ [:+, :-, :*, :/]
+        #     deriv = DiffRules.diffrule(M, f, :x, :y)
+        #     @eval begin
+        #         @test D($M.$f)(x, y) == $deriv
+        #         # $M.$f(Dx::Differential, Dy::Differential) = binaryOp($f, (x, y)->$deriv)(Dx, Dy)
+        #     end
         end
     end
 end
 
-@testset "Euler-Lagrange Solver" begin
+@testset "   Euler-Lagrange Solver" begin
     function Γ(w)
        t -> UpTuple((t, w(t), D(w)(t)))
     end

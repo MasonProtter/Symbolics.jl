@@ -1,6 +1,8 @@
 # Calculus.jl
 
 # [[file:~/Documents/Julia/scrap.org::*Calculus.jl][Calculus.jl:1]]
+
+Base.adjoint(Dx::Differential) = Differential(tag => adjoint(value) for (tag, value) in Dx.terms)
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # Addition of Differentials
@@ -50,6 +52,9 @@ function Base.:*(t1::DTag,t2::DTag)
     end
 end
 
+Base.one(Dx::Differential)  = 1.0
+Base.zero(Dx::Differential) = 0.0
+
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # constructors for new unary and binary operations
@@ -61,8 +66,20 @@ function unaryOp(f::T, Df::U) where {T<:Union{Function,SymExpr},U<:Union{Functio
 end
 
 function binaryOp(f::Function, Dfx::Function, Dfy::Function)
-    function (Dx::Differential, Dy::Differential)
-        f(Dx[1:end-1],Dy[1:end-1]) + Dfx(Dx[1:end-1], Dy[1:end-1])*Dx[end] + Dfy(Dx[1:end-1], Dy[1:end-1])*Dy[end]
+    function (x, y)
+        if (x isa Differential) && (y isa Differential)
+            Dx = x
+            Dy = y;
+            f(Dx[1:end-1],Dy[1:end-1]) + Dfx(Dx[1:end-1], Dy[1:end-1])*Dx[end] + Dfy(Dx[1:end-1], Dy[1:end-1])*Dy[end]
+        elseif  (x isa Differential)
+            Dx = x
+            f(Dx[1:end-1],y) + Dfx(Dx[1:end-1], y)*Dx[end]
+        elseif y isa Differential
+            Dy = y
+            f(x,Dy[1:end-1]) + Dfy(x, Dy[1:end-1])*Dy[end]
+        else
+            throw("one of two arguments must be a differential")
+        end
     end
 end
 
@@ -73,24 +90,85 @@ Base.:-(Dx::Differential, Dy::Differential) = binaryOp((x,y) -> x - y,
                                                        (x,y) -> -1)(Dx,Dy)
 
 Base.:/(Dx::Differential,y::Number) = unaryOp(Dx -> Dx/y, Dx -> 1/y)(Dx)
-Base.:/(x::Number,Dy::Differential) = unaryOp(Dy -> x/Dy, Dy -> -1/(Dy)^2)(Dy)
+Base.:/(x::Number,Dy::Differential) = unaryOp(Dy -> x/Dy, Dy -> -x/(Dy)^2)(Dy)
 Base.:/(Dx::Differential,Dy::Differential) = binaryOp((x,y) -> x/y,
                                                       (x,y) -> 1/y,
                                                       (x,y) -> -x/y^2)(Dx,Dy)
+Base.inv(Dx::Differential) = 1/Dx
 
 Base.:^(Dx::Differential,y::Number) = unaryOp(Dx -> Dx^y, Dx -> y*Dx^(y-1))(Dx)
 Base.:^(Dx::Differential,y::Int) = unaryOp(Dx -> Dx^y, Dx -> y*Dx^(y-1))(Dx)
 Base.:^(x::Number,Dy::Differential) = unaryOp(Dy -> x^Dy, Dy -> log(x)*x^Dy)(Dy)
 
-Base.exp(Dx::Differential) = unaryOp(exp, exp)(Dx)
+# Define differentiation rules for most Base and SpecialFunctions math functions
 
-Base.log(Dx::Differential) = unaryOp(log, x -> 1/x)(Dx)
+# Base.:(\ )(x::Differential,y::Number) = inv(x)*y
+# Base.:(\ )(x::Number,y::Differential) = inv(x)*y
+# Base.:(\ )(x::Differential,y::Differential) = inv(x)*y
 
-Base.sqrt(Dx::Differential) = unaryOp(sqrt, x -> 1/(2*sqrt(x)))(Dx)
 
-Base.sin(Dx::Differential) = unaryOp(sin, x -> cos(x))(Dx)
+function Base.atan(Dx::Union{Number,Differential}, Dy::Union{Number,Differential})
+    binaryOp(atan,
+             (x,y) ->  y/(x^2 + y^2),
+             (x,y) -> -x/(x^2 + y^2))(Dx, Dy)
+end
 
-Base.cos(Dx::Differential) = unaryOp(cos, x -> -sin(x))(Dx)
+function Base.hypot(Dx::Union{Number,Differential}, Dy::Union{Number,Differential})
+    binaryOp(hypot,
+             (x,y) ->  x/hypot(x,y),
+             (x,y) ->  y/hypot(x,y))(Dx,Dy)
+end
+
+function SpecialFunctions.besselj(ν, Dx::Differential)
+    unaryOp(x -> besselj(ν,x), x ->(besselj(ν - 1, x) - besselj(ν + 1, x))/2)(Dx)
+end
+function SpecialFunctions.besseli(ν, Dx::Differential)
+    unaryOp(x -> besseli(ν,x), x ->(besseli(ν - 1, x) + besseli(ν + 1, x))/2)(Dx)
+end
+function SpecialFunctions.bessely(ν, Dx::Differential)
+    unaryOp(x -> bessely(ν,x), x ->(bessely(ν - 1, x) - bessely(ν + 1, x))/2)(Dx)
+end
+function SpecialFunctions.besselk(ν, Dx::Differential)
+    unaryOp(x -> besselk(ν,x), x ->(besselk(ν - 1, x) + besselk(ν + 1, x))/2)(Dx)
+end
+function SpecialFunctions.hankelh1(ν, Dx::Differential)
+    unaryOp(x -> hankelh1(ν,x), x ->(hankelh1(ν - 1, x) - hankelh1(ν + 1, x))/2)(Dx)
+end
+
+function SpecialFunctions.hankelh2(ν, Dx::Differential)
+    unaryOp(x -> hankelh2(ν,x), x ->(hankelh2(ν - 1, x) - hankelh2(ν + 1, x))/2)(Dx)
+end
+
+function SpecialFunctions.polygamma(m, Dx::Differential)
+    unaryOp(x -> polygamma(m,x), x -> polygamma(m + 1, x))(Dx)
+end
+
+function SpecialFunctions.beta(Dx::Union{Number,Differential}, Dy::Union{Number,Differential})
+    binaryOp(beta,
+             (x,y) -> beta(x,y)*(digamma(x)-digamma(x+y)),
+             (x,y) -> beta(x,y)*(digamma(y)-digamma(x+y)))(Dx,Dy)
+end
+
+function SpecialFunctions.lbeta(Dx::Union{Number,Differential}, Dy::Union{Number,Differential})
+    binaryOp(lbeta,
+             (x,y) -> digamma(x)-digamma(x+y),
+             (x,y) -> digamma(y)-digamma(x+y))(Dx,Dy)
+end
+
+
+for (M, f, arity) in DiffRules.diffrules()
+    if arity == 1 && (M == :Base || M == :SpecialFunctions) && f ∉ [:inv, :+, :-, :abs] # [:bessely0, :besselj0, :bessely1, :besselj1]
+        deriv = DiffRules.diffrule(M, f, :x)
+        @eval begin
+            $M.$f(Dx::Differential) = unaryOp($f, x->$deriv)(Dx)
+        end
+    # elseif arity == 2 && (M == :Base || M == :SpecialFunctions) && f ∉ [:+, :-, :*, :/]
+    #     deriv = DiffRules.diffrule(M, f, :x, :y)
+    #     @eval begin
+    #         $M.$f(Dx::Differential, Dy::Differential) = binaryOp($f, (x, y)->$deriv)(Dx, Dy)
+    #     end
+    end
+end
 
 #---------------------------------------------------------------
 #---------------------------------------------------------------

@@ -37,26 +37,124 @@ Base.zero(a::Symbolic) = 0
 # Division
 Base.:(/)(x::T, y::T) where {T<:Symbolic} = promote(T)(:*, stripiden.([x, y^-1]))  |> simplify
 
-
 #_____________________________________________
 # Exponents
 Base.:(^)(x::T, y::T) where {T<:Symbolic}   = promote(T)(:^, stripiden.([x, y]))  |> simplify
 Base.:(^)(x::T, y::Int) where {T<:Symbolic} = promote(T)(:^, stripiden.([x, y]))  |> simplify
-Base.exp(x::T) where {T<:Symbolic} = promote(T)(:exp, stripiden.([x]))  |> simplify
 
-Base.sqrt(x::T) where {T<:Symbolic} = promote(T)(:sqrt, stripiden.([x]))  |> simplify
 
 #_____________________________________________
-# inv
+# other
 Base.inv(x::T) where {T<:Symbolic} = promote(T)(:^, stripiden.([x, -1]))  |> simplify
 
-#_____________________________________________
-# Logarithms
-Base.log(x::T) where {T<:Symbolic} = promote(T)(:log, stripiden.([x]))  |> simplify
+Base.:( \ )(x::T,y::T) where {T<:Symbolic} = inv(x)*y
+
+Base.abs(x::T) where {T<:Symbolic} = sqrt(x^2)
+
+Base.conj(x::Union{AbstractSymExpr,AbstractSym}) = x
+
+
+promote_SymForm(x::Number, y::Union{Sym,SymExpr}) = SymExpr
+promote_SymForm(x::Union{Sym,SymExpr}, y::Number) = SymExpr
+promote_SymForm(x::Union{Sym,SymExpr}, y::Union{Sym,SymExpr}) = SymExpr
+
+
+
+SymNum = Union{Symbolic,Number}
+
+function Base.atan(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+   promote_SymForm(x,y)(:atan, stripiden.([x,y]))
+end
+    
+function Base.hypot(x::T, y::V) where {T<:Symbolic,V<:Symbolic} 
+   promote_SymForm(x,y)(:hypot, stripiden.([x,y]))
+end
+function Base.hypot(x::T, y::V) where {T<:Number,V<:Symbolic} 
+   promote_SymForm(x,y)(:hypot, stripiden.([x,y]))
+end
+function Base.hypot(x::T, y::V) where {T<:Symbolic,V<:Number} 
+   promote_SymForm(x,y)(:hypot, stripiden.([x,y]))
+end
+
+function Base.max(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(x,y)(:max, stripiden.([x,y]))
+end
+
+
+function Base.min(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(x,y)(:min, stripiden.([x,y]))
+end
+
+function Base.:<(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(x,y)(:<, stripiden.([x,y]))
+end
+
+function SpecialFunctions.besselj(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(ν,x)(:besselj, stripiden.([ν, x]))
+end
+
+function SpecialFunctions.besseli(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(ν,x)(:besseli, stripiden.([ν, x]))
+end
+
+function SpecialFunctions.bessely(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(ν,x)(:bessely, stripiden.([ν, x]))
+end
+
+function SpecialFunctions.besselk(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(ν,x)(:besselk, stripiden.([ν, x]))
+end
+
+function SpecialFunctions.hankelh1(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(ν,x)(:hankelh1, stripiden.([ν, x]))
+end
+
+function SpecialFunctions.hankelh2(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(ν,x)(:hankelh2, stripiden.([ν, x]))
+end
+
+function SpecialFunctions.polygamma(m::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(m,x)(:polygamma, stripiden.([m, x]))
+end
+function SpecialFunctions.polygamma(m::Int, x::V) where {V<:SymNum} 
+    promote_SymForm(m,x)(:polygamma, stripiden.([m, x]))
+end
+
+
+function SpecialFunctions.beta(a::T, b::V) where {T<:Number,V<:Symbolic} 
+    promote_SymForm(a,b)(:beta, stripiden.([a, b]))
+end
+function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Number} 
+    promote_SymForm(a,b)(:beta, stripiden.([a, b]))
+end
+function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Symbolic} 
+    promote_SymForm(a,b)(:beta, stripiden.([a, b]))
+end
+
+function SpecialFunctions.lbeta(a::T, b::V) where {T<:Number,V<:Symbolic} 
+    promote_SymForm(a,b)(:lbeta, stripiden.([a, b]))
+end
+function SpecialFunctions.lbeta(a::T, b::V) where {T<:Symbolic,V<:Number} 
+    promote_SymForm(a,b)(:lbeta, stripiden.([a, b]))
+end
+function SpecialFunctions.lbeta(a::T, b::V) where {T<:Symbolic,V<:Symbolic} 
+    promote_SymForm(a,b)(:lbeta, stripiden.([a, b]))
+end
+
 
 #_____________________________________________
-# Trig
-Base.cos(x::T) where {T<:Symbolic} = promote(T)(:cos, stripiden.([x]))  |> simplify
-Base.sin(x::T) where {T<:Symbolic} = promote(T)(:sin, stripiden.([x]))  |> simplify
-Base.tan(x::T) where {T<:Symbolic} = promote(T)(:tan, stripiden.([x]))  |> simplify
+# More math functions
+for (M, f, arity) in DiffRules.diffrules()
+    if arity == 1 && (M == :Base || M == :SpecialFunctions) && f ∉ [:inv, :+, :-, :abs] # [:bessely0, :besselj0, :bessely1, :besselj1]
+        deriv = DiffRules.diffrule(M, f, :x)
+        @eval begin
+            $M.$f(x::T) where {T<:Symbolic} = promote(T)(Symbol($f), stripiden.([x]))  |> simplify
+        end
+    # elseif arity == 2 && (M == :Base || M == :SpecialFunctions) && f ∉ [:+, :-, :*, :/, :^]
+    #     deriv = DiffRules.diffrule(M, f, :x, :y)
+    #     @eval begin
+    #         $M.$f(x::T, y::T) where {T<:Symbolic} = promote(T)(Symbol($f), stripiden.([x, y]))  |> simplify
+    #     end
+    end
+end
 # SymbolicAlgebra.jl:1 ends here

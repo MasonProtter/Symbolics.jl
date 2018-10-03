@@ -59,19 +59,27 @@ promote_SymForm(x::Union{Sym,SymExpr}, y::Number) = SymExpr
 promote_SymForm(x::Union{Sym,SymExpr}, y::Union{Sym,SymExpr}) = SymExpr
 
 
+
 SymNum = Union{Symbolic,Number}
 
 function Base.atan(x::T, y::V) where {T<:SymNum,V<:SymNum} 
    promote_SymForm(x,y)(:atan, stripiden.([x,y]))
 end
     
-function Base.hypot(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+function Base.hypot(x::T, y::V) where {T<:Symbolic,V<:Symbolic} 
+   promote_SymForm(x,y)(:hypot, stripiden.([x,y]))
+end
+function Base.hypot(x::T, y::V) where {T<:Number,V<:Symbolic} 
+   promote_SymForm(x,y)(:hypot, stripiden.([x,y]))
+end
+function Base.hypot(x::T, y::V) where {T<:Symbolic,V<:Number} 
    promote_SymForm(x,y)(:hypot, stripiden.([x,y]))
 end
 
 function Base.max(x::T, y::V) where {T<:SymNum,V<:SymNum} 
     promote_SymForm(x,y)(:max, stripiden.([x,y]))
 end
+
 
 function Base.min(x::T, y::V) where {T<:SymNum,V<:SymNum} 
     promote_SymForm(x,y)(:min, stripiden.([x,y]))
@@ -123,8 +131,14 @@ function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Symbolic}
     promote_SymForm(a,b)(:beta, stripiden.([a, b]))
 end
 
-function SpecialFunctions.lbeta(a::T, b::V) where {T<:SymNum,V<:SymNum} 
-    promote_SymForm(a,b)(:lbeta, stripiden.([a, b]))
+function SpecialFunctions.beta(a::T, b::V) where {T<:Number,V<:Symbolic} 
+    promote_SymForm(a,b)(:beta, stripiden.([a, b]))
+end
+function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Number} 
+    promote_SymForm(a,b)(:beta, stripiden.([a, b]))
+end
+function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Symbolic} 
+    promote_SymForm(a,b)(:beta, stripiden.([a, b]))
 end
 
 

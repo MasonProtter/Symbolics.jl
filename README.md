@@ -74,7 +74,7 @@ julia> D(x(t)^2 + 2x(t), t)
 # New: Generate the Euler Lagrange Equations from a Lagrangian
 We can now define a Lagrangian, say that of a simple harmonic oscillator as 
 ```julia
-using Smybolics
+using Symbolics
 
 @sym x m ω t
 

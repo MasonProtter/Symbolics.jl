@@ -87,6 +87,11 @@ for (M, f, arity) in DiffRules.diffrules()
         @eval begin
             $M.$f(Dx::Symbolics.Differential) = Symbolics.unaryOp($f, x->$deriv)(Dx)
         end
+    elseif arity == 2 && (M == :Base || M == :SpecialFunctions)
+        deriv = DiffRules.diffrule(M, f, :x, :y)
+        @eval begin
+            $M.$f(Dx::Differential, Dy::Differential) = Symbolics.binaryOp($f, (x, y)->$deriv)(Dx, Dy)
+        end
     end
 end
 

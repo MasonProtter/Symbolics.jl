@@ -6,7 +6,7 @@ using Match
 import Lazy: @>
 # using ForwardDiff
 using DataStructures
-# using Match
+using DiffRules
 
 
 include("types.jl")

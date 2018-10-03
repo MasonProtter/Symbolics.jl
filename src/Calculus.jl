@@ -80,15 +80,13 @@ Base.:^(Dx::Differential,y::Number) = unaryOp(Dx -> Dx^y, Dx -> y*Dx^(y-1))(Dx)
 Base.:^(Dx::Differential,y::Int) = unaryOp(Dx -> Dx^y, Dx -> y*Dx^(y-1))(Dx)
 Base.:^(x::Number,Dy::Differential) = unaryOp(Dy -> x^Dy, Dy -> log(x)*x^Dy)(Dy)
 
-Base.exp(Dx::Differential) = unaryOp(exp, exp)(Dx)
-
-Base.log(Dx::Differential) = unaryOp(log, x -> 1/x)(Dx)
-
-Base.sqrt(Dx::Differential) = unaryOp(sqrt, x -> 1/(2*sqrt(x)))(Dx)
-
-Base.sin(Dx::Differential) = unaryOp(sin, x -> cos(x))(Dx)
-
-Base.cos(Dx::Differential) = unaryOp(cos, x -> -sin(x))(Dx)
+# overloading some Base math functions for Symbolics.Differential
+for f in [:exp, :log, :sqrt, :sin, :cos]
+    deriv = DiffRules.diffrule(:Base, f, :x)
+    @eval begin
+       Base.$f(Dx::Symbolics.Differential) = Symbolics.unaryOp($f, x->$deriv)(Dx)
+   end
+end
 
 #---------------------------------------------------------------
 #---------------------------------------------------------------

@@ -69,6 +69,9 @@ SpecialFunctions.polygamma(m::T, x::T) where {T<:Symbolic} = promote(T)(:polygam
 SpecialFunctions.beta(a::T, b::T) where {T<:Symbolic} = promote(T)(:beta, stripiden.([a, b]))
 SpecialFunctions.lbeta(a::T, b::T) where {T<:Symbolic} = promote(T)(:lbeta, stripiden.([a, b]))
 
+SpecialFunctions.besselj(ν::Int, x::T) where {T<:Symbolic} = promote(T)(:besselj, stripiden.([ν, x]))
+SpecialFunctions.bessely(ν::Int, x::T) where {T<:Symbolic} = promote(T)(:bessely, stripiden.([ν, x]))
+
 #_____________________________________________
 # More math functions
 for (M, f, arity) in DiffRules.diffrules()

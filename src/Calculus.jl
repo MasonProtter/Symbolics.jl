@@ -80,17 +80,17 @@ Base.:^(Dx::Differential,y::Number) = unaryOp(Dx -> Dx^y, Dx -> y*Dx^(y-1))(Dx)
 Base.:^(Dx::Differential,y::Int) = unaryOp(Dx -> Dx^y, Dx -> y*Dx^(y-1))(Dx)
 Base.:^(x::Number,Dy::Differential) = unaryOp(Dy -> x^Dy, Dy -> log(x)*x^Dy)(Dy)
 
-# overloading some Base math functions for Symbolics.Differential
+# Define differentiation rules for most Base and SpecialFunctions math functions
 for (M, f, arity) in DiffRules.diffrules()
-    if arity == 1 && (M == :Base || M == :SpecialFunctions)
+    if arity == 1 && (M == :Base || M == :SpecialFunctions) && f ∉ [:inv, :+, :-, :abs, :trigamma, :digamma, :invdigamma, :gamma, :lgamma] # [:bessely0, :besselj0, :bessely1, :besselj1]
         deriv = DiffRules.diffrule(M, f, :x)
         @eval begin
-            $M.$f(Dx::Symbolics.Differential) = Symbolics.unaryOp($f, x->$deriv)(Dx)
+            $M.$f(Dx::Differential) = unaryOp($f, x->$deriv)(Dx)
         end
-    elseif arity == 2 && (M == :Base || M == :SpecialFunctions)
+    elseif arity == 2 && (M == :Base || M == :SpecialFunctions) && f ∉ [:+, :-, :*, :/]
         deriv = DiffRules.diffrule(M, f, :x, :y)
         @eval begin
-            $M.$f(Dx::Differential, Dy::Differential) = Symbolics.binaryOp($f, (x, y)->$deriv)(Dx, Dy)
+            $M.$f(Dx::Differential, Dy::Differential) = binaryOp($f, (x, y)->$deriv)(Dx, Dy)
         end
     end
 end

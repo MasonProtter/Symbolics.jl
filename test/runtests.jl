@@ -1,7 +1,7 @@
 # tests
 
 # [[file:~/Documents/Julia/scrap.org::*tests][tests:1]]
-using Symbolics, Test
+using Symbolics, DiffRules, SpecialFunctions, Test
 
 @sym x y z m ω t;
 
@@ -40,6 +40,21 @@ end
     @test (D^3)(f+g)(x) == 6
     @test D(x^2 + y^2 + z^2, x) == 2x
     @test D(D(2x*y, x), y) == 2
+    # test diff rules
+    for (M, f, arity) in DiffRules.diffrules()
+        if arity == 1 && (M == :Base || M == :SpecialFunctions) && f ∉ [:inv, :+, :-, :abs, :trigamma, :digamma, :invdigamma, :gamma, :lgamma] # [:bessely0, :besselj0, :bessely1, :besselj1]
+            deriv = DiffRules.diffrule(M, f, :x)
+            @eval begin
+                @test D($M.$f)(x) == $deriv
+            end
+        elseif arity == 2 && (M == :Base || M == :SpecialFunctions) && f ∉ [:+, :-, :*, :/]
+            deriv = DiffRules.diffrule(M, f, :x, :y)
+            @eval begin
+                @test D($M.$f)(x, y) == $deriv
+                # $M.$f(Dx::Differential, Dy::Differential) = binaryOp($f, (x, y)->$deriv)(Dx, Dy)
+            end
+        end
+    end
 end
 
 @testset "Euler-Lagrange Solver" begin

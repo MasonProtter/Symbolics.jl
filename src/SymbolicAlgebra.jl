@@ -53,29 +53,81 @@ Base.abs(x::T) where {T<:Symbolic} = sqrt(x^2)
 
 Base.conj(x::Union{AbstractSymExpr,AbstractSym}) = x
 
-Base.atan(x::T, y::T) where {T<:Symbolic} = promote(T)(:atan, stripiden.([x,y]))
-Base.hypot(x::T, y::T) where {T<:Symbolic} = promote(T)(:hypot, stripiden.([x,y]))
-Base.max(x::T, y::T) where {T<:Symbolic} = promote(T)(:max, stripiden.([x,y]))
-Base.min(x::T, y::T) where {T<:Symbolic} = promote(T)(:min, stripiden.([x,y]))
 
 
-SpecialFunctions.besselj(ν::T, x::T) where {T<:Symbolic} = promote(T)(:besselj, stripiden.([ν, x]))
-SpecialFunctions.besseli(ν::T, x::T) where {T<:Symbolic} = promote(T)(:besseli, stripiden.([ν, x]))
-SpecialFunctions.besselk(ν::T, x::T) where {T<:Symbolic} = promote(T)(:besselk, stripiden.([ν, x]))
-SpecialFunctions.hankelh1(ν::T, x::T) where {T<:Symbolic} = promote(T)(:hankelh1, stripiden.([ν, x]))
-SpecialFunctions.hankelh2(ν::T, x::T) where {T<:Symbolic} = promote(T)(:hankelh2, stripiden.([ν, x]))
-SpecialFunctions.bessely(ν::T, x::T) where {T<:Symbolic} = promote(T)(:bessely, stripiden.([ν, x]))
-SpecialFunctions.polygamma(m::T, x::T) where {T<:Symbolic} = promote(T)(:polygamma, stripiden.([m, x]))
-SpecialFunctions.beta(a::T, b::T) where {T<:Symbolic} = promote(T)(:beta, stripiden.([a, b]))
-SpecialFunctions.lbeta(a::T, b::T) where {T<:Symbolic} = promote(T)(:lbeta, stripiden.([a, b]))
+SymNum = Union{Symbolic,Number}
 
-SpecialFunctions.besselj(ν::Int, x::T) where {T<:Symbolic} = promote(T)(:besselj, stripiden.([ν, x]))
-SpecialFunctions.bessely(ν::Int, x::T) where {T<:Symbolic} = promote(T)(:bessely, stripiden.([ν, x]))
+function Base.atan(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+   promote_SymForm(x,y)(:atan, stripiden.([x,y]))
+end
+    
+function Base.hypot(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+   promote_SymForm(x,y)(:hypot, stripiden.([x,y]))
+end
+
+function Base.max(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(x,y)(:max, stripiden.([x,y]))
+end
+
+function Base.min(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(x,y)(:min, stripiden.([x,y]))
+end
+
+function Base.:<(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(x,y)(:<, stripiden.([x,y]))
+end
+
+function SpecialFunctions.besselj(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(ν,x)(:besselj, stripiden.([ν, x]))
+end
+
+function SpecialFunctions.besseli(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(ν,x)(:besseli, stripiden.([ν, x]))
+end
+
+function SpecialFunctions.bessely(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(ν,x)(:bessely, stripiden.([ν, x]))
+end
+
+function SpecialFunctions.besselk(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(ν,x)(:besselk, stripiden.([ν, x]))
+end
+
+function SpecialFunctions.hankelh1(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(ν,x)(:hankelh1, stripiden.([ν, x]))
+end
+
+function SpecialFunctions.hankelh2(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(ν,x)(:hankelh2, stripiden.([ν, x]))
+end
+
+function SpecialFunctions.polygamma(m::T, x::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(m,x)(:polygamma, stripiden.([m, x]))
+end
+function SpecialFunctions.polygamma(m::Int, x::V) where {V<:SymNum} 
+    promote_SymForm(m,x)(:polygamma, stripiden.([m, x]))
+end
+
+
+function SpecialFunctions.beta(a::T, b::V) where {T<:Number,V<:Symbolic} 
+    promote_SymForm(a,b)(:beta, stripiden.([a, b]))
+end
+function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Number} 
+    promote_SymForm(a,b)(:beta, stripiden.([a, b]))
+end
+function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Symbolic} 
+    promote_SymForm(a,b)(:beta, stripiden.([a, b]))
+end
+
+function SpecialFunctions.lbeta(a::T, b::V) where {T<:SymNum,V<:SymNum} 
+    promote_SymForm(a,b)(:lbeta, stripiden.([a, b]))
+end
+
 
 #_____________________________________________
 # More math functions
 for (M, f, arity) in DiffRules.diffrules()
-    if arity == 1 && (M == :Base || M == :SpecialFunctions) && f ∉ [:inv, :+, :-, :abs, :trigamma, :digamma, :invdigamma, :gamma, :lgamma] # [:bessely0, :besselj0, :bessely1, :besselj1]
+    if arity == 1 && (M == :Base || M == :SpecialFunctions) && f ∉ [:inv, :+, :-, :abs] # [:bessely0, :besselj0, :bessely1, :besselj1]
         deriv = DiffRules.diffrule(M, f, :x)
         @eval begin
             $M.$f(x::T) where {T<:Symbolic} = promote(T)(Symbol($f), stripiden.([x]))  |> simplify

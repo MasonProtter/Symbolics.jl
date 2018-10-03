@@ -87,11 +87,11 @@ for (M, f, arity) in DiffRules.diffrules()
         @eval begin
             $M.$f(Dx::Differential) = unaryOp($f, x->$deriv)(Dx)
         end
-    elseif arity == 2 && (M == :Base || M == :SpecialFunctions) && f ∉ [:+, :-, :*, :/]
-        deriv = DiffRules.diffrule(M, f, :x, :y)
-        @eval begin
-            $M.$f(Dx::Differential, Dy::Differential) = binaryOp($f, (x, y)->$deriv)(Dx, Dy)
-        end
+    # elseif arity == 2 && (M == :Base || M == :SpecialFunctions) && f ∉ [:+, :-, :*, :/]
+    #     deriv = DiffRules.diffrule(M, f, :x, :y)
+    #     @eval begin
+    #         $M.$f(Dx::Differential, Dy::Differential) = binaryOp($f, (x, y)->$deriv)(Dx, Dy)
+    #     end
     end
 end
 

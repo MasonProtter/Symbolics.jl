@@ -42,20 +42,32 @@ Base.:(/)(x::T, y::T) where {T<:Symbolic} = promote(T)(:*, stripiden.([x, y^-1])
 Base.:(^)(x::T, y::T) where {T<:Symbolic}   = promote(T)(:^, stripiden.([x, y]))  |> simplify
 Base.:(^)(x::T, y::Int) where {T<:Symbolic} = promote(T)(:^, stripiden.([x, y]))  |> simplify
 
+
 #_____________________________________________
 # other
 Base.inv(x::T) where {T<:Symbolic} = promote(T)(:^, stripiden.([x, -1]))  |> simplify
 
-Base.:(\)(x::T,y::T) where {T<:Symbolic} = inv(x)*y
+Base.:( \ )(x::T,y::T) where {T<:Symbolic} = inv(x)*y
 
 Base.abs(x::T) where {T<:Symbolic} = sqrt(x^2)
 
-Base.conj(x::AbstractSym) = x
-Base.conj(x::AbstractSymExpr) = x
+Base.conj(x::Union{AbstractSymExpr,AbstractSym}) = x
 
-SpecialFunctions.bessely(a, x::T) where {T<:Symbolic} = promote(T)(:bessely, stripiden.([a, x])) 
-SpecialFunctions.besselj(a, x::T) where {T<:Symbolic} = promote(T)(:besselj, stripiden.([a, x]))
+Base.atan(x::T, y::T) where {T<:Symbolic} = promote(T)(:atan, stripiden.([x,y]))
+Base.hypot(x::T, y::T) where {T<:Symbolic} = promote(T)(:hypot, stripiden.([x,y]))
+Base.max(x::T, y::T) where {T<:Symbolic} = promote(T)(:max, stripiden.([x,y]))
+Base.min(x::T, y::T) where {T<:Symbolic} = promote(T)(:min, stripiden.([x,y]))
 
+
+SpecialFunctions.besselj(ν::T, x::T) where {T<:Symbolic} = promote(T)(:besselj, stripiden.([ν, x]))
+SpecialFunctions.besseli(ν::T, x::T) where {T<:Symbolic} = promote(T)(:besseli, stripiden.([ν, x]))
+SpecialFunctions.besselk(ν::T, x::T) where {T<:Symbolic} = promote(T)(:besselk, stripiden.([ν, x]))
+SpecialFunctions.hankelh1(ν::T, x::T) where {T<:Symbolic} = promote(T)(:hankelh1, stripiden.([ν, x]))
+SpecialFunctions.hankelh2(ν::T, x::T) where {T<:Symbolic} = promote(T)(:hankelh2, stripiden.([ν, x]))
+SpecialFunctions.bessely(ν::T, x::T) where {T<:Symbolic} = promote(T)(:bessely, stripiden.([ν, x]))
+SpecialFunctions.polygamma(m::T, x::T) where {T<:Symbolic} = promote(T)(:polygamma, stripiden.([m, x]))
+SpecialFunctions.beta(a::T, b::T) where {T<:Symbolic} = promote(T)(:beta, stripiden.([a, b]))
+SpecialFunctions.lbeta(a::T, b::T) where {T<:Symbolic} = promote(T)(:lbeta, stripiden.([a, b]))
 
 #_____________________________________________
 # More math functions

@@ -54,6 +54,10 @@ Base.abs(x::T) where {T<:Symbolic} = sqrt(x^2)
 Base.conj(x::Union{AbstractSymExpr,AbstractSym}) = x
 
 
+promote_SymForm(x::Number, y::Union{Sym,SymExpr}) = SymExpr
+promote_SymForm(x::Union{Sym,SymExpr}, y::Number) = SymExpr
+promote_SymForm(x::Union{Sym,SymExpr}, y::Union{Sym,SymExpr}) = SymExpr
+
 
 SymNum = Union{Symbolic,Number}
 

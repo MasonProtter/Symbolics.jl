@@ -221,9 +221,6 @@ function exp_exp(ex::T) where {T<:AbstractSymExpr}
          _                        => ex
      end
 end
-         
-         
-    
 
 #----------------------------------------------------------------------------
 # More Misc. Rules

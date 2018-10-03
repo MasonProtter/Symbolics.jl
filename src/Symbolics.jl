@@ -1,3 +1,5 @@
+# Symbolics.jl
+
 # [[file:~/Documents/Julia/scrap.org::*Symbolics.jl][Symbolics.jl:1]]
 module Symbolics
 

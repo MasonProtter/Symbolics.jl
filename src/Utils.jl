@@ -1,3 +1,5 @@
+# Utils.jl
+
 # [[file:~/Documents/Julia/scrap.org::*Utils.jl][Utils.jl:1]]
 walk(x, inner, outer) = outer(x)
 walk(x::T, inner, outer) where {T<:AbstractSymExpr} = outer(T(inner(x.op), map(inner, x.args)))

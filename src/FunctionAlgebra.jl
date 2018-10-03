@@ -6,9 +6,9 @@
 
 function Base.:+(f1::Union{Function,Operator}, f2::Union{Function,Operator})
     if f1 == f2
-        t -> 2*f1(t)
+	t -> 2*f1(t)
     else
-        t -> f1(t) + f2(t)
+	t -> f1(t) + f2(t)
     end
 end
 
@@ -19,27 +19,26 @@ Base.:+(f::Union{Function,Operator}, a::Number) = t -> f(t) + a
 # Subtraction
 function Base.:-(f1::Union{Function,Operator}, f2::Union{Function,Operator})
     if f1 == f2
-        function (t)
-            0
-        end
+	function (t)
+	    0
+	end
     else
-        function (t)
-            f1(t) - f2(t)
-        end
+	function (t)
+	    f1(t) - f2(t)
+	end
     end
 end
 
 Base.:-(a::Number, f::Union{Function,Operator}) = t -> a - f(t)
 Base.:-(f::Union{Function,Operator}, a::Number) = t -> f(t) - a
 
-
 #_____________________________________________
 # Multiplication
 function Base.:*(f1::Function, f2::Function)
     if f1 == f2
-        t -> f1(t)*f1(t)
+	t -> f1(t)*f1(t)
     else
-        t -> f1(t)*f2(t)
+	t -> f1(t)*f2(t)
     end
 end
 
@@ -55,9 +54,9 @@ Base.:*(f::Union{Function,Operator}, a::Number) = *(a, f)
 
 function Base.:/(f1::Function, f2::Function)
     if f1 == f2
-        t -> 1
+	t -> 1
     else
-        t -> f1(t)/f2(t)
+	t -> f1(t)/f2(t)
     end
 end
 
@@ -69,7 +68,7 @@ Base.:/(f::Function, a::Number) = t -> f(t)/a
 
 function Base.:^(a::Operator, b::Integer)
     function (t)
-        foldl((x,y)->a(x),1:b,init=t)
+	foldl((x,y)->a(x),1:b,init=t)
     end
 end
 # FunctionAlgebra.jl:1 ends here

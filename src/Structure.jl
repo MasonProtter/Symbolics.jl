@@ -1,3 +1,5 @@
+# Structure.jl
+
 # [[file:~/Documents/Julia/scrap.org::*Structure.jl][Structure.jl:1]]
 Base.length(A::UpTuple) = length(A.data)
 Base.eachindex(A::UpTuple) = eachindex(A.data)

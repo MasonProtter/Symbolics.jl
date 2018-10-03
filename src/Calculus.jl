@@ -82,7 +82,7 @@ Base.:^(x::Number,Dy::Differential) = unaryOp(Dy -> x^Dy, Dy -> log(x)*x^Dy)(Dy)
 
 # overloading some Base math functions for Symbolics.Differential
 for (M, f, arity) in DiffRules.diffrules()
-    if arity == 1 && M == :Base
+    if arity == 1 && (M == :Base || M == :SpecialFunctions)
         deriv = DiffRules.diffrule(M, f, :x)
         @eval begin
             $M.$f(Dx::Symbolics.Differential) = Symbolics.unaryOp($f, x->$deriv)(Dx)

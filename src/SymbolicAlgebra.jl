@@ -131,14 +131,14 @@ function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Symbolic}
     promote_SymForm(a,b)(:beta, stripiden.([a, b]))
 end
 
-function SpecialFunctions.beta(a::T, b::V) where {T<:Number,V<:Symbolic} 
-    promote_SymForm(a,b)(:beta, stripiden.([a, b]))
+function SpecialFunctions.lbeta(a::T, b::V) where {T<:Number,V<:Symbolic} 
+    promote_SymForm(a,b)(:lbeta, stripiden.([a, b]))
 end
-function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Number} 
-    promote_SymForm(a,b)(:beta, stripiden.([a, b]))
+function SpecialFunctions.lbeta(a::T, b::V) where {T<:Symbolic,V<:Number} 
+    promote_SymForm(a,b)(:lbeta, stripiden.([a, b]))
 end
-function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Symbolic} 
-    promote_SymForm(a,b)(:beta, stripiden.([a, b]))
+function SpecialFunctions.lbeta(a::T, b::V) where {T<:Symbolic,V<:Symbolic} 
+    promote_SymForm(a,b)(:lbeta, stripiden.([a, b]))
 end
 
 

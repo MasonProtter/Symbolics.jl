@@ -62,7 +62,6 @@ function Base.max(x::T, y::V) where {T<:SymNum,V<:SymNum}
     promote_SymForm(x,y)(:max, stripiden.([x,y]))
 end
 
-
 function Base.min(x::T, y::V) where {T<:SymNum,V<:SymNum} 
     promote_SymForm(x,y)(:min, stripiden.([x,y]))
 end

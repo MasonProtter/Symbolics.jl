@@ -1,7 +1,6 @@
 # Calculus.jl
 
 # [[file:~/Documents/Julia/scrap.org::*Calculus.jl][Calculus.jl:1]]
-
 Base.adjoint(Dx::Differential) = Differential(tag => adjoint(value) for (tag, value) in Dx.terms)
 #---------------------------------------------------------------
 #---------------------------------------------------------------

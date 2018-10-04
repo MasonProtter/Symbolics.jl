@@ -5,14 +5,12 @@ module Symbolics
 
 using LinearAlgebra
 using Match
-import Lazy: @>
-# using ForwardDiff
+using Lazy: @>
 using DataStructures
 using DiffRules, SpecialFunctions
 
 
 include("types.jl")
-# include("UpDownTuples.jl")
 include("Utils.jl")
 include("SymbolicAlgebra.jl")
 include("Simplification.jl")

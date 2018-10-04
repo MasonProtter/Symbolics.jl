@@ -2,18 +2,6 @@
 
 # [[file:~/Documents/Julia/scrap.org::*SymbolicAlgebra.jl][SymbolicAlgebra.jl:1]]
 #_____________________________________________
-# Promotion Rules
-
-Base.promote(::Type{Sym}) = SymExpr
-Base.promote(::Type{SymExpr}) = SymExpr
-
-Base.promote(x::T, y::Number) where {T<:Symbolic} = (promote(T)(:identity, [x]), promote(T)(:identity, [y]))
-Base.promote(x::Number, y::T) where {T<:Symbolic} = (promote(T)(:identity, [x]), promote(T)(:identity, [y]))
-Base.promote(x::Sym, y::SymExpr) = (SymExpr(:identity, [x]), y)
-Base.promote(x::SymExpr, y::Sym) = (x, SymExpr(:identity, [y]))
-
-
-#_____________________________________________
 # Addition
 Base.:(+)(x::T, y::T) where {T<:Symbolic} = promote(T)(:+, stripiden.([x, y])) |> simplify
 Base.:+(x::Symbolic) = x #|> simplify
@@ -52,12 +40,6 @@ Base.:( \ )(x::T,y::T) where {T<:Symbolic} = inv(x)*y
 Base.abs(x::T) where {T<:Symbolic} = sqrt(x^2)
 
 Base.conj(x::Union{AbstractSymExpr,AbstractSym}) = x
-
-
-promote_SymForm(x::Number, y::Union{Sym,SymExpr}) = SymExpr
-promote_SymForm(x::Union{Sym,SymExpr}, y::Number) = SymExpr
-promote_SymForm(x::Union{Sym,SymExpr}, y::Union{Sym,SymExpr}) = SymExpr
-
 
 
 SymNum = Union{Symbolic,Number}
@@ -145,16 +127,10 @@ end
 #_____________________________________________
 # More math functions
 for (M, f, arity) in DiffRules.diffrules()
-    if arity == 1 && (M == :Base || M == :SpecialFunctions) && f ∉ [:inv, :+, :-, :abs] # [:bessely0, :besselj0, :bessely1, :besselj1]
-        deriv = DiffRules.diffrule(M, f, :x)
+    if arity == 1 && (M == :Base || M == :SpecialFunctions) && f ∉ [:inv, :+, :-, :abs]
         @eval begin
             $M.$f(x::T) where {T<:Symbolic} = promote(T)(Symbol($f), stripiden.([x]))  |> simplify
         end
-    # elseif arity == 2 && (M == :Base || M == :SpecialFunctions) && f ∉ [:+, :-, :*, :/, :^]
-    #     deriv = DiffRules.diffrule(M, f, :x, :y)
-    #     @eval begin
-    #         $M.$f(x::T, y::T) where {T<:Symbolic} = promote(T)(Symbol($f), stripiden.([x, y]))  |> simplify
-    #     end
     end
 end
 # SymbolicAlgebra.jl:1 ends here

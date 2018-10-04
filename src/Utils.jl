@@ -19,4 +19,16 @@ end
 
 (ex::SymExpr)(p::Pair) = replace_sym(ex, p)
 (ex::Sym)(p::Pair) = replace_sym(ex, p)
+
+Base.promote(::Type{Sym}) = SymExpr
+Base.promote(::Type{SymExpr}) = SymExpr
+
+Base.promote(x::T, y::Number) where {T<:Symbolic} = (promote(T)(:identity, [x]), promote(T)(:identity, [y]))
+Base.promote(x::Number, y::T) where {T<:Symbolic} = (promote(T)(:identity, [x]), promote(T)(:identity, [y]))
+Base.promote(x::Sym, y::SymExpr) = (SymExpr(:identity, [x]), y)
+Base.promote(x::SymExpr, y::Sym) = (x, SymExpr(:identity, [y]))
+
+promote_SymForm(x::Number, y::Union{Sym,SymExpr}) = SymExpr
+promote_SymForm(x::Union{Sym,SymExpr}, y::Number) = SymExpr
+promote_SymForm(x::Union{Sym,SymExpr}, y::Union{Sym,SymExpr}) = SymExpr
 # Utils.jl:1 ends here

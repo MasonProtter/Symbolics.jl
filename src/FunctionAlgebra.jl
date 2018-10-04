@@ -1,9 +1,6 @@
 # FunctionAlgebra.jl
 
 # [[file:~/Documents/Julia/scrap.org::*FunctionAlgebra.jl][FunctionAlgebra.jl:1]]
-#_____________________________________________
-# Addition
-
 function Base.:+(f1::Union{Function,Operator}, f2::Union{Function,Operator})
     if f1 == f2
 	t -> 2*f1(t)

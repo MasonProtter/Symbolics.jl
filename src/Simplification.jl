@@ -229,7 +229,7 @@ end
 eval_numeric(x) = x
 function eval_numeric(ex::T) where {T<:AbstractSymExpr}
     if ([!(arg isa Symbolic) for arg in ex.args] == trues(length(ex.args))) && (try eval(Symbol(ex.op)) catch e; false end isa Function)
-        eval(Symbol(ex.op))(ex.args...)
+        eval(Expr(ex))
     else
         ex
     end

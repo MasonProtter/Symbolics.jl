@@ -19,6 +19,7 @@ end
     @test x * x^-4 == x^-3
     @test (x^y)^2/x == x^(y*2 - 1)
     @test 1 \ x == x
+
 end
 
 @testset "        Function Algebra" begin

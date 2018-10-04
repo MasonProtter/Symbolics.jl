@@ -18,6 +18,8 @@ end
     @test ((2x + 3)^2 + 4(2x + 3)^2) * (2x + 3)^3 ==  (2 * x + 3)^5 * 5
     @test x * x^-4 == x^-3
     @test (x^y)^2/x == x^(y*2 - 1)
+    @test 1 \ x == x
+
 end
 
 @testset "        Function Algebra" begin

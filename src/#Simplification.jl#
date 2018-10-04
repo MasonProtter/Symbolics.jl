@@ -62,7 +62,7 @@ function simplify(ex::AbstractSymExpr)
         out2 = simplify_pass(out1)
         counter += 1
         if counter > 1000
-            @warn "possible infinite loop in simplification rules. Breaking"
+b            @warn "possible infinite loop in simplification rules. Breaking"
             return out2
         end 
     end
@@ -228,8 +228,8 @@ end
 #----------------------------------------------------------------------------
 eval_numeric(x) = x
 function eval_numeric(ex::T) where {T<:AbstractSymExpr}
-    if ([!(arg isa Symbolic) for arg in ex.args] == trues(length(ex.args))) && (try eval(Symbol(ex.op)) catch e; false end isa Function)
-        eval(Expr(ex))
+    if (try eval(Symbol(ex.op)) isa Function catch e; false) && ([!(arg isa Symbolic) for arg in ex.args] == trues(length(ex.args)))
+        eval(Symbol(ex.op))(ex.args...)
     else
         ex
     end

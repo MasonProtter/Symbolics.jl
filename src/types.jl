@@ -5,7 +5,7 @@
 #---------------------------------------------------------------
 # Syms
 abstract type Symbolic <: Number  end
-abstract type AbstractSym <: Symbolic end 
+abstract type AbstractSym <: Symbolic end
 
 struct Sym <: AbstractSym
     name::Symbol
@@ -47,7 +47,7 @@ Base.Symbol(s::AbstractSym) = s.name
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 # SymExprs
-abstract type AbstractSymExpr <: Symbolic end 
+abstract type AbstractSymExpr <: Symbolic end
 struct SymExpr <: AbstractSymExpr
     op::Symbolic
     args::Vector
@@ -103,12 +103,14 @@ Base.eval(a::AbstractSymExpr) = eval(Expr(a))
 
 abstract type Structure end
 
-struct UpTuple <: Structure
-    data::Tuple
+SymOrSymExpr = Union{Sym, SymExpr}
+
+struct UpTuple{T} <: Structure where {T<:SymOrSymExpr}
+    data::Vector{T}
 end
 
-struct DownTuple <: Structure
-    data::Tuple
+struct DownTuple{T} <: Structure where {T<:SymOrSymExpr}
+    data::Vector{T}
 end
 
 function Base.show(io::IO, up::UpTuple)
@@ -127,8 +129,8 @@ function Base.show(io::IO, down::DownTuple)
     print(io, "down$(arr)")
 end
 
-(arr::UpTuple)(t) = UpTuple(Tuple(i(t) for i in arr.data))
-(arr::DownTuple)(t) = DownTuple(Tuple(i(t) for i in arr.data))
+(arr::UpTuple)(t) = UpTuple(arr.(t))
+(arr::DownTuple)(t) = DownTuple(arr.(t))
 
 up(data...) = UpTuple(data)
 down(data...) = DownTuple(data)

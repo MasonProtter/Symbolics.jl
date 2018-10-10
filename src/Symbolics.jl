@@ -19,7 +19,7 @@ include("FunctionAlgebra.jl")
 include("Structure.jl")
 
 
-export Sym, SymExpr, AbstractSym, AbstractSymExpr, @sym, Symbolic, D, ∂, simplify, UpTuple
+export Sym, SymExpr, AbstractSym, AbstractSymExpr, @sym, Symbolic, D, ∂, simplify, UpTuple, DownTuple
 export up, down, square
 
 end

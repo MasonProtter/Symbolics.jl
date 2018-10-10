@@ -105,12 +105,12 @@ abstract type Structure end
 
 SymOrSymExpr = Union{Sym, SymExpr}
 
-struct UpTuple{T} <: Structure where {T<:SymOrSymExpr}
-    data::Vector{T}
+struct UpTuple <: Structure
+    data::Vector
 end
 
-struct DownTuple{T} <: Structure where {T<:SymOrSymExpr}
-    data::Vector{T}
+struct DownTuple <: Structure
+    data::Vector
 end
 
 function Base.show(io::IO, up::UpTuple)
@@ -129,11 +129,11 @@ function Base.show(io::IO, down::DownTuple)
     print(io, "down$(arr)")
 end
 
-(arr::UpTuple)(t) = UpTuple(arr.(t))
-(arr::DownTuple)(t) = DownTuple(arr.(t))
+(arr::UpTuple)(t) = UpTuple([i(t) for i in arr.data])
+(arr::DownTuple)(t) = DownTuple([i(t) for i in arr.data])
 
-up(data...) = UpTuple(data)
-down(data...) = DownTuple(data)
+up(data) = UpTuple(data)
+down(data) = DownTuple(data)
 
 expand_expression(arr::UpTuple) = up([expand_expression(i) for i in arr.data]...)
 Base.getindex(arr::UpTuple, i::Integer) = getindex(arr.data, i)

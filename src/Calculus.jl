@@ -187,14 +187,19 @@ function extractDiff(Dx::Differential, ϵ::Differential)
         out
     end
 end
+
 extractDiff(ex::Symbolic, ϵ::Differential) = 0
+
+extractDiff(ex::UpTuple, ϵ::Differential) = UpTuple([extractDiff(ex[i], ϵ) for i in eachindex(ex)])
 
 function D(f::Function)
     ϵ = makeDiff()
     x -> extractDiff(f(x + ϵ), ϵ)
 end
 
-D(f::T) where{T<:Symbolic} = promote(T)(:D, [f])
+D(f::T) where {T<:Symbolic} = promote(T)(:D, [f])
+D(q::UpTuple) = up(D.(q.data))
+D(q::DownTuple) = down(D.(q.data))
 (f::Sym)(Dt::Differential) = f(Dt[1:end-1]) + D(f)(Dt[1:end-1])*Dt[end]
 (ex::SymExpr)(Dx::Differential) = unaryOp(ex, D(ex))(Dx)
 
@@ -204,11 +209,18 @@ function D(ex::Symbolic, s::AbstractSym)
     extractDiff(Dex, ϵ)
 end
 
-
 function ∂(i)
     function (f)
-        ϵ = makeDiff()
-        arg -> extractDiff(f(UpTuple([i==j ? arg[j]+ϵ : arg[j] for j in eachindex(arg)])),ϵ)
+        arg -> begin
+            if typeof(arg[i]) <: Union{Symbolic, Differential} #length(arg[i]) == 1
+                ϵ = makeDiff()
+                val = [i==j ? arg[j]+ϵ : arg[j] for j in eachindex(arg)]
+                extractDiff(f(UpTuple(val)), ϵ)
+            elseif typeof(arg[i]) == UpTuple # length(arg[i]) > 1
+                ϵv = [Symbolics.makeDiff() for i in eachindex(arg[i])]
+                UpTuple([  begin val = [i==j ? begin [l==k ? arg[j][k]+ϵv[k] : arg[j][l] for l in eachindex(arg[j])] end : arg[j] for j in eachindex(arg)]; extractDiff( f(UpTuple(val)) , ϵv[k] ) end for k in eachindex(arg[i])  ])
+            end
+        end
     end
 end
 # Calculus.jl:1 ends here

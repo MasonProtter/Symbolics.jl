@@ -3,7 +3,7 @@
 # [[file:~/Documents/Julia/scrap.org::*tests][tests:1]]
 using Symbolics, DiffRules, SpecialFunctions, Test
 
-@sym x y z m ω t ν;
+@sym x y z m ω t ν μ;
 
 
 @testset "Construction of SymExprs" begin
@@ -120,5 +120,25 @@ end
     @test Lagrange_Equations(L_SHO)(x)(t)  == (D(D(x)))(t) * m + (x)(t) * m * ω ^ 2
     @test Lagrange_Equations(L_free)(x)(t) == (D(D(x)))(t) * m
     @test Lagrange_Equations(L_pendulum)(x)(t) == (D(D(x)))(t) * m + sin((x)(t))
+
+    function L_free_3d(local_tuple::UpTuple)
+        t, q, qdot = local_tuple.data
+        (qdot[1]^2+qdot[2]^2+qdot[3]^2)/2
+    end
+
+    q = UpTuple([x, y, z])
+
+    @test Lagrange_Equations(L_free_3d)(q)(t).data == [(D(D(x)))(t), (D(D(y)))(t), (D(D(z)))(t)]
+
+    function L_kepler(local_tuple::UpTuple)
+        t, q, qdot = local_tuple.data
+        (qdot[1]^2+qdot[2]^2)/2+μ/(q[1]^2+q[2]^2)^(1/2)
+    end
+
+    q = UpTuple([x, y])
+
+    # @show Lagrange_Equations(L_kepler)(q)(t).data
+    @test Lagrange_Equations(L_kepler)(q)(t).data == SymExpr[(D(D(x)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (x)(t) * μ, (D(D(y)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (y)(t) * μ]
+
 end
 # tests:1 ends here

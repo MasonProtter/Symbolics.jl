@@ -208,8 +208,7 @@ end
 function ∂(i)
     function (f)
         ϵ = makeDiff()
-        arg -> extractDiff(f(UpTuple(Tuple(i==j ? arg[j]+ϵ
-                                                : arg[j] for j in eachindex(arg)))),ϵ)
+        arg -> extractDiff(f(UpTuple([i==j ? arg[j]+ϵ : arg[j] for j in eachindex(arg)])),ϵ)
     end
 end
 # Calculus.jl:1 ends here

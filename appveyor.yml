@@ -15,10 +15,10 @@ matrix:
   - julia_version: nightly
   - julia_version: 0.7
 
-branches:
-  only:
-    - master
-    - /release-.*/
+# branches:
+#   only:
+#     - master
+#     - /release-.*/
 
 notifications:
   - provider: Email

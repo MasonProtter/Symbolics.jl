@@ -47,23 +47,23 @@ end
     @test D(y -> atan(x,y))(y) == -x/(x^2 + y^2)
     @test D(x -> hypot(x,y))(x) == x/hypot(x,y)
     @test D(y -> hypot(x,y))(y) == y/hypot(x,y)
-    
+
     @test D(x -> besselj(ν,x))(x) == (besselj(ν - 1, x) - besselj(ν + 1, x))/2
     @test D(x -> besseli(ν,x))(x) == (besseli(ν - 1, x) + besseli(ν + 1, x))/2
     @test D(x -> bessely(ν,x))(x) == (bessely(ν - 1, x) - bessely(ν + 1, x))/2
     @test D(x -> besselk(ν,x))(x) == (besselk(ν - 1, x) + besselk(ν + 1, x))/2
-    
+
     @test D(x -> hankelh1(ν,x))(x) == (hankelh1(ν - 1, x) - hankelh1(ν + 1, x))/2
     @test D(x -> hankelh2(ν,x))(x) == (hankelh2(ν - 1, x) - hankelh2(ν + 1, x))/2
-    
+
     @test D(x -> polygamma(m,x))(x) == polygamma(m + 1, x)
-    
+
     @test D(x -> beta(x,y))(x) == beta(x,y)*(digamma(x)-digamma(x+y))
     @test D(y -> beta(x,y))(y) == beta(x,y)*(digamma(y)-digamma(x+y))
 
     @test D(x -> lbeta(x,y))(x) == digamma(x)-digamma(x+y)
     @test D(y -> lbeta(x,y))(y) == digamma(y)-digamma(x+y)
-    
+
     for (M, f, arity) in DiffRules.diffrules()
         if arity == 1 && (M == :Base || M == :SpecialFunctions) && f ∉ [:inv, :+, :-, :abs, ] # [:bessely0, :besselj0, :bessely1, :besselj1]
             deriv = DiffRules.diffrule(M, f, :x)
@@ -74,9 +74,28 @@ end
     end
 end
 
+@testset "   UpTuple and DownTuple" begin
+    # UpTuple
+    ut = UpTuple([x, x^2, -x-y])
+    @test ut == ut
+    @test string(ut) == "up(x\n   x ^ 2\n   (x + y) * -1)"
+    @test (ut(t)).data == [x(t), (x^2)(t), (-x-y)(t)]
+    @test string(ut(t)) == string(  UpTuple([x(t), (x^2)(t), (-x-y)(t)])  )
+    @test up(ut.data) == ut
+    @test ut[2] == x^2
+    ut[2] = y
+    @test y == ut[2]
+    @test ut.data == [x, y, -x-y]
+    # DownTuple
+    dt = DownTuple([x, x^2, -x-y])
+    @test dt == dt
+    @test (dt(t)).data == [x(t), (x^2)(t), (-x-y)(t)]
+    @test down(dt.data) == dt
+end
+
 @testset "   Euler-Lagrange Solver" begin
     function Γ(w)
-       t -> UpTuple((t, w(t), D(w)(t)))
+       t -> UpTuple([t, w(t), D(w)(t)])
     end
 
     function Lagrange_Equations(L)

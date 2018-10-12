@@ -211,7 +211,7 @@ end
 
 function ∂(i)
     function (f)
-        arg -> compute_partial(f, arg, i, arg[i])
+        arg -> compute_partial(f, arg, i)
     end
 end
 

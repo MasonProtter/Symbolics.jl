@@ -11,10 +11,6 @@ Base.:+(x::Symbolic) = x #|> simplify
 # Subtraction
 Base.:(-)(x::T, y::T) where {T<:Symbolic} = promote(T)(:+, stripiden.([x, -y]))  |> simplify
 Base.:(-)(x::T) where {T<:Symbolic} = promote(T)(:*, [-1, x])  |> simplify
-# Base.:(-)(x::Int, y::UpTuple) = UpTuple(x .- y.data)
-# Base.:(-)(x::UpTuple, y::Int) = UpTuple(x.data .- y)
-Base.:(-)(x::UpTuple, y::UpTuple) = UpTuple(x.data-y.data)
-
 
 #_____________________________________________
 # Multiplication

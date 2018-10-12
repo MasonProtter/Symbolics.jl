@@ -19,4 +19,10 @@ using Symbolics, Test
     @test dt == dt
     @test (dt(t)).data == [x(t), (x^2)(t), (-x-y)(t)]
     @test down(dt.data) == dt
+
+    P = up([x^2-1, sin(y)])
+    Q = up([x^2-1, sin(y)])
+
+    @test P == Q
+    @test all(Q .== P)
 end

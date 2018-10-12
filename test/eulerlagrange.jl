@@ -30,6 +30,7 @@ using Symbolics, Test
     @test Lagrange_Equations(L_free)(x)(t) == (D(D(x)))(t) * m
     @test Lagrange_Equations(L_pendulum)(x)(t) == (D(D(x)))(t) * m + sin((x)(t))
 
+    # Lagrangian for the free particle in space (3D)
     function L_free_3d(local_tuple::UpTuple)
         t, q, qdot = local_tuple.data
         (qdot[1]^2+qdot[2]^2+qdot[3]^2)/2
@@ -37,7 +38,16 @@ using Symbolics, Test
 
     q = UpTuple([x, y, z])
 
-    @test Lagrange_Equations(L_free_3d)(q)(t).data == [(D(D(x)))(t), (D(D(y)))(t), (D(D(z)))(t)]
+    fp3d_eqs = SymExpr[(D(D(x)))(t), (D(D(y)))(t), (D(D(z)))(t)] # eqs of motion for the free particle in space
+    lagrange_eqs_fp3d = Lagrange_Equations(L_free_3d)(q)
+    lagrange_eqs_fp3d_t = Lagrange_Equations(L_free_3d)(q)(t)
+    @test typeof(lagrange_eqs_fp3d_t) == UpTuple
+    @test lagrange_eqs_fp3d_t.data == fp3d_eqs
+    @test lagrange_eqs_fp3d_t == up(fp3d_eqs)
+    @test lagrange_eqs_fp3d_t == UpTuple(fp3d_eqs)
+    @test lagrange_eqs_fp3d(t).data == fp3d_eqs
+    @test lagrange_eqs_fp3d(t) == up(fp3d_eqs)
+    @test lagrange_eqs_fp3d(t) == UpTuple(fp3d_eqs)
 
     function L_kepler(local_tuple::UpTuple)
         t, q, qdot = local_tuple.data
@@ -45,9 +55,19 @@ using Symbolics, Test
         (qdot[1]^2+qdot[2]^2)*(m/2)+μ/r
     end
 
+    # Lagrangian for the Kepler problem
     q = UpTuple([x, y])
 
     # Equivalent to Eq. (1.48) of SICM
-    @test Lagrange_Equations(L_kepler)(q)(t).data == SymExpr[m * (D(D(x)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (x)(t) * μ, m * (D(D(y)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (y)(t) * μ]
+    kepler_eqs = SymExpr[m * (D(D(x)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (x)(t) * μ, m * (D(D(y)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (y)(t) * μ]
+    lagrange_eqs_kepler = Lagrange_Equations(L_kepler)(q)
+    lagrange_eqs_kepler_t = Lagrange_Equations(L_kepler)(q)(t)
+    @test typeof(lagrange_eqs_kepler_t) == UpTuple
+    @test lagrange_eqs_kepler_t.data == kepler_eqs
+    @test lagrange_eqs_kepler_t == up(kepler_eqs)
+    @test lagrange_eqs_kepler_t == UpTuple(kepler_eqs)
+    @test lagrange_eqs_kepler(t).data == kepler_eqs
+    @test lagrange_eqs_kepler(t) == up(kepler_eqs)
+    @test lagrange_eqs_kepler(t) == UpTuple(kepler_eqs)
 
 end

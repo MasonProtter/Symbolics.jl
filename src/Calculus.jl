@@ -209,6 +209,14 @@ function D(ex::Symbolic, s::AbstractSym)
     extractDiff(Dex, ϵ)
 end
 
+function ∂(i)
+    function (f)
+        arg -> compute_partial(f, arg, i, arg[i])
+    end
+end
+
+compute_partial(f, arg, i) = compute_partial(f, arg, i, arg[i])
+
 function compute_partial(f, arg, i, ::T) where {T <: Union{SymExpr, Differential}}
     ϵ = makeDiff()
     val = [i==j ? arg[j]+ϵ : arg[j] for j in eachindex(arg)]
@@ -218,11 +226,5 @@ end
 function compute_partial(f, arg, i, ::UpTuple)
     ϵv = [Symbolics.makeDiff() for i in eachindex(arg[i])]
     return UpTuple([  begin val = [i==j ? begin [l==k ? arg[j][k]+ϵv[k] : arg[j][l] for l in eachindex(arg[j])] end : arg[j] for j in eachindex(arg)]; extractDiff( f(UpTuple(val)) , ϵv[k] ) end for k in eachindex(arg[i])  ])
-end
-
-function ∂(i)
-    function (f)
-        arg -> compute_partial(f, arg, i, arg[i])
-    end
 end
 # Calculus.jl:1 ends here

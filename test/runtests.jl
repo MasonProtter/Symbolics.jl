@@ -132,13 +132,14 @@ end
 
     function L_kepler(local_tuple::UpTuple)
         t, q, qdot = local_tuple.data
-        (qdot[1]^2+qdot[2]^2)/2+μ/(q[1]^2+q[2]^2)^(1/2)
+        r = (q[1]^2+q[2]^2)^(1/2)
+        (qdot[1]^2+qdot[2]^2)*(m/2)+μ/r
     end
 
     q = UpTuple([x, y])
 
-    # @show Lagrange_Equations(L_kepler)(q)(t).data
-    @test Lagrange_Equations(L_kepler)(q)(t).data == SymExpr[(D(D(x)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (x)(t) * μ, (D(D(y)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (y)(t) * μ]
+    # Equivalent to Eq. (1.48) of SICM
+    @test Lagrange_Equations(L_kepler)(q)(t).data == SymExpr[m * (D(D(x)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (x)(t) * μ, m * (D(D(y)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (y)(t) * μ]
 
 end
 # tests:1 ends here

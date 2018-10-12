@@ -38,10 +38,10 @@ using Symbolics, Test
 
     q = UpTuple([x, y, z])
 
-    fp3d_eqs = SymExpr[(D(D(x)))(t), (D(D(y)))(t), (D(D(z)))(t)] # eqs of motion for the free particle in space
     lagrange_eqs_fp3d = Lagrange_Equations(L_free_3d)(q)
     lagrange_eqs_fp3d_t = Lagrange_Equations(L_free_3d)(q)(t)
     @test typeof(lagrange_eqs_fp3d_t) == UpTuple
+    fp3d_eqs = [(D(D(x)))(t), (D(D(y)))(t), (D(D(z)))(t)] # eqs of motion for the free particle in space
     @test lagrange_eqs_fp3d_t.data == fp3d_eqs
     @test lagrange_eqs_fp3d_t == up(fp3d_eqs)
     @test lagrange_eqs_fp3d_t == UpTuple(fp3d_eqs)
@@ -59,10 +59,10 @@ using Symbolics, Test
     q = UpTuple([x, y])
 
     # Equivalent to Eq. (1.48) of SICM
-    kepler_eqs = SymExpr[m * (D(D(x)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (x)(t) * μ, m * (D(D(y)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (y)(t) * μ]
     lagrange_eqs_kepler = Lagrange_Equations(L_kepler)(q)
     lagrange_eqs_kepler_t = Lagrange_Equations(L_kepler)(q)(t)
     @test typeof(lagrange_eqs_kepler_t) == UpTuple
+    kepler_eqs = [m * (D(D(x)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (x)(t) * μ, m * (D(D(y)))(t) + ((x)(t) ^ 2 + (y)(t) ^ 2) ^ -1.5 * (y)(t) * μ]
     @test lagrange_eqs_kepler_t.data == kepler_eqs
     @test lagrange_eqs_kepler_t == up(kepler_eqs)
     @test lagrange_eqs_kepler_t == UpTuple(kepler_eqs)

@@ -49,13 +49,13 @@ using Symbolics, Test
     @test lagrange_eqs_fp3d(t) == up(fp3d_eqs)
     @test lagrange_eqs_fp3d(t) == UpTuple(fp3d_eqs)
 
+    # Lagrangian for the Kepler problem
     function L_kepler(local_tuple::UpTuple)
         t, q, qdot = local_tuple.data
         r = (q[1]^2+q[2]^2)^(1/2)
         (qdot[1]^2+qdot[2]^2)*(m/2)+μ/r
     end
 
-    # Lagrangian for the Kepler problem
     q = UpTuple([x, y])
 
     # Equivalent to Eq. (1.48) of SICM

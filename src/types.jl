@@ -19,8 +19,8 @@ end
 macro sym(names...)
     out = Expr(:block)
     for name in names
-	v = Sym(name)
-	push!(out.args, Expr(:(=), name, v))
+        v = Sym(name)
+        push!(out.args, Expr(:(=), name, v))
     end
    esc(out)
 end
@@ -205,14 +205,14 @@ t2 = DTag([1])
 mutable struct Differential
     terms::SortedDict
     function Differential(iterable)
-	new(try delete!(SortedDict(iterable),DTag(-1)) catch; SortedDict(iterable) end)
+        new(try delete!(SortedDict(iterable),DTag(-1)) catch; SortedDict(iterable) end)
     end
 end
 
 function printEpsilons(t::DTag)
     str = ""
     for i in t.tag
-	str = str*"ϵ$i"
+        str = str*"ϵ$i"
     end
     str
 end

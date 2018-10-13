@@ -12,7 +12,6 @@ Base.:+(x::Symbolic) = x #|> simplify
 Base.:(-)(x::T, y::T) where {T<:Symbolic} = promote(T)(:+, stripiden.([x, -y]))  |> simplify
 Base.:(-)(x::T) where {T<:Symbolic} = promote(T)(:*, [-1, x])  |> simplify
 
-
 #_____________________________________________
 # Multiplication
 Base.:(*)(x::T, y::T) where {T<:Symbolic} = ((x == y) ? promote(T)(:^, stripiden.([x, 2])) :
@@ -44,81 +43,81 @@ Base.conj(x::Union{AbstractSymExpr,AbstractSym}) = x
 
 SymNum = Union{Symbolic,Number}
 
-function Base.atan(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+function Base.atan(x::T, y::V) where {T<:SymNum,V<:SymNum}
    promote_SymForm(x,y)(:atan, stripiden.([x,y]))
 end
-    
-function Base.hypot(x::T, y::V) where {T<:Symbolic,V<:Symbolic} 
+
+function Base.hypot(x::T, y::V) where {T<:Symbolic,V<:Symbolic}
    promote_SymForm(x,y)(:hypot, stripiden.([x,y]))
 end
-function Base.hypot(x::T, y::V) where {T<:Number,V<:Symbolic} 
+function Base.hypot(x::T, y::V) where {T<:Number,V<:Symbolic}
    promote_SymForm(x,y)(:hypot, stripiden.([x,y]))
 end
-function Base.hypot(x::T, y::V) where {T<:Symbolic,V<:Number} 
+function Base.hypot(x::T, y::V) where {T<:Symbolic,V<:Number}
    promote_SymForm(x,y)(:hypot, stripiden.([x,y]))
 end
 
-function Base.max(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+function Base.max(x::T, y::V) where {T<:SymNum,V<:SymNum}
     promote_SymForm(x,y)(:max, stripiden.([x,y]))
 end
 
-function Base.min(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+function Base.min(x::T, y::V) where {T<:SymNum,V<:SymNum}
     promote_SymForm(x,y)(:min, stripiden.([x,y]))
 end
 
-function Base.:<(x::T, y::V) where {T<:SymNum,V<:SymNum} 
+function Base.:<(x::T, y::V) where {T<:SymNum,V<:SymNum}
     promote_SymForm(x,y)(:<, stripiden.([x,y]))
 end
 
-function SpecialFunctions.besselj(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+function SpecialFunctions.besselj(ν::T, x::V) where {T<:SymNum,V<:SymNum}
     promote_SymForm(ν,x)(:besselj, stripiden.([ν, x]))
 end
 
-function SpecialFunctions.besseli(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+function SpecialFunctions.besseli(ν::T, x::V) where {T<:SymNum,V<:SymNum}
     promote_SymForm(ν,x)(:besseli, stripiden.([ν, x]))
 end
 
-function SpecialFunctions.bessely(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+function SpecialFunctions.bessely(ν::T, x::V) where {T<:SymNum,V<:SymNum}
     promote_SymForm(ν,x)(:bessely, stripiden.([ν, x]))
 end
 
-function SpecialFunctions.besselk(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+function SpecialFunctions.besselk(ν::T, x::V) where {T<:SymNum,V<:SymNum}
     promote_SymForm(ν,x)(:besselk, stripiden.([ν, x]))
 end
 
-function SpecialFunctions.hankelh1(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+function SpecialFunctions.hankelh1(ν::T, x::V) where {T<:SymNum,V<:SymNum}
     promote_SymForm(ν,x)(:hankelh1, stripiden.([ν, x]))
 end
 
-function SpecialFunctions.hankelh2(ν::T, x::V) where {T<:SymNum,V<:SymNum} 
+function SpecialFunctions.hankelh2(ν::T, x::V) where {T<:SymNum,V<:SymNum}
     promote_SymForm(ν,x)(:hankelh2, stripiden.([ν, x]))
 end
 
-function SpecialFunctions.polygamma(m::T, x::V) where {T<:SymNum,V<:SymNum} 
+function SpecialFunctions.polygamma(m::T, x::V) where {T<:SymNum,V<:SymNum}
     promote_SymForm(m,x)(:polygamma, stripiden.([m, x]))
 end
-function SpecialFunctions.polygamma(m::Int, x::V) where {V<:SymNum} 
+function SpecialFunctions.polygamma(m::Int, x::V) where {V<:SymNum}
     promote_SymForm(m,x)(:polygamma, stripiden.([m, x]))
 end
 
 
-function SpecialFunctions.beta(a::T, b::V) where {T<:Number,V<:Symbolic} 
+function SpecialFunctions.beta(a::T, b::V) where {T<:Number,V<:Symbolic}
     promote_SymForm(a,b)(:beta, stripiden.([a, b]))
 end
-function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Number} 
+function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Number}
     promote_SymForm(a,b)(:beta, stripiden.([a, b]))
 end
-function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Symbolic} 
+function SpecialFunctions.beta(a::T, b::V) where {T<:Symbolic,V<:Symbolic}
     promote_SymForm(a,b)(:beta, stripiden.([a, b]))
 end
 
-function SpecialFunctions.lbeta(a::T, b::V) where {T<:Number,V<:Symbolic} 
+function SpecialFunctions.lbeta(a::T, b::V) where {T<:Number,V<:Symbolic}
     promote_SymForm(a,b)(:lbeta, stripiden.([a, b]))
 end
-function SpecialFunctions.lbeta(a::T, b::V) where {T<:Symbolic,V<:Number} 
+function SpecialFunctions.lbeta(a::T, b::V) where {T<:Symbolic,V<:Number}
     promote_SymForm(a,b)(:lbeta, stripiden.([a, b]))
 end
-function SpecialFunctions.lbeta(a::T, b::V) where {T<:Symbolic,V<:Symbolic} 
+function SpecialFunctions.lbeta(a::T, b::V) where {T<:Symbolic,V<:Symbolic}
     promote_SymForm(a,b)(:lbeta, stripiden.([a, b]))
 end
 

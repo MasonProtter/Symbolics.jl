@@ -5,7 +5,8 @@ testfiles = (
     "algebra.jl",
     "derivatives.jl",
     "structures.jl",
-    "eulerlagrange.jl"
+    "eulerlagrange.jl",
+    "latex.jl",
     )
 
 for file in testfiles

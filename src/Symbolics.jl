@@ -17,6 +17,7 @@ include("Simplification.jl")
 include("Calculus.jl")
 include("FunctionAlgebra.jl")
 include("Structure.jl")
+include("LaTeX.jl")
 
 
 export Sym, SymExpr, AbstractSym, AbstractSymExpr, @sym, Symbolic, D, ∂, simplify, UpTuple, DownTuple

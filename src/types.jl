@@ -53,8 +53,13 @@ struct SymExpr <: AbstractSymExpr
     args::Vector
 end
 
+# This is only valid for numbers
+iscommutative(op) = op == Sym(:*) || op == Sym(:+)
+
 function Base.:(==)(x::AbstractSymExpr,y::AbstractSymExpr)
-    (x.op == y.op) && (length(x.args) == length(y.args)) && all(isequal.(x.args,y.args))
+    (x.op == y.op) && (length(x.args) == length(y.args)) &&
+        (all(isequal.(x.args,y.args)) ||
+         iscommutative(x.op) && all(a in y.args for a in x.args))
 end
 
 Base.:(==)(x::AbstractSymExpr, y) = false

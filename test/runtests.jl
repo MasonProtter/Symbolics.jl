@@ -7,6 +7,7 @@ testfiles = (
     "structures.jl",
     "eulerlagrange.jl",
     "latex.jl",
+    "newnumbers.jl",
     )
 
 for file in testfiles

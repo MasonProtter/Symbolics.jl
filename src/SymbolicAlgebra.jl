@@ -131,4 +131,49 @@ for (M, f, arity) in DiffRules.diffrules()
         end
     end
 end
+
+# This is different from a possible `isnegative` in that `-x` could be
+# positive, if `x` is negative. This function returns `true` if there
+# is a factor `-1` present.
+isnegated(::Number) = false
+isnegated(r::Real) = r < 0
+isnegated(s::SymExpr) = s.op.name == :(*) && findfirst(isequal(-1), s.args) !== nothing
+
+isdenominator(a::Number) = false
+isdenominator(a::SymExpr) = (a.op.name == :(^) && isnegated(a.args[2]))
+
+Base.numerator(s::Sym) = s
+Base.denominator(s::Sym) = 1
+
+function Base.numerator(expr::SymExpr)
+    isdenominator(expr) && return 1
+    if expr.op.name == :(*)
+        args = filter(a -> !isdenominator(a), expr.args)
+        length(args) > 1 ? prod(args) : args[1]
+    else
+        expr
+    end
+end
+
+function Base.denominator(expr::SymExpr)
+    # # This would be the simplest implemenation, if simplification
+    # # worked (e.g. inv(xy/sin(x)) becomes (x * y * sin(x) ^ -1) ^ -1
+    # # at the moment):
+    # return numerator(inv(expr))
+    if expr.op.name == :(*)
+        den = filter(isdenominator, expr.args)
+        isempty(den) && return 1
+        # Negate exponents of all factors that should be in the
+        # denominator.
+        args = map(inv, den)#  do a
+        #     a.args[1] ^ (-a.args[2])
+        # end
+        length(args) > 1 ? prod(args) : args[1]
+    elseif expr.op.name == :(^)
+        numerator(inv(expr))
+    else
+        1
+    end
+end
+
 # SymbolicAlgebra.jl:1 ends here

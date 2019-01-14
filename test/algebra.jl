@@ -5,6 +5,7 @@ import Symbolics: isnegated, isdenominator
 
 @testset "Construction of SymExprs" begin
     @test x(t) == SymExpr(x, [t])
+    @test SymExpr(Sym(:+), [1, 2, 2]) != SymExpr(Sym(:+), [1, 1, 2])
 end
 
 @testset "                 Algebra" begin

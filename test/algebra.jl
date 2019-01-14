@@ -1,6 +1,7 @@
 using Symbolics, Test
+import Symbolics: isnegated, isdenominator
 
-@sym x y t
+@sym x y z t
 
 @testset "Construction of SymExprs" begin
     @test x(t) == SymExpr(x, [t])
@@ -27,4 +28,40 @@ end
 
 @testset "            Replacements" begin
     @test (x^2 + 2x)(x => y) == y^2 + 2y
+end
+
+@testset "        Helper functions" begin
+    @test !isnegated(x)
+    @test !isnegated(5)
+    @test isnegated(-5)
+    @test isnegated(-x)
+    @test isnegated(-sin(x))
+
+    @test !isdenominator(5)
+    @test !isdenominator(x)
+    @test isdenominator(1/x)
+
+    @test numerator(x) == x
+    @test denominator(x) == 1
+
+    @test numerator(1/x) == 1
+    @test denominator(1/x) == x
+
+    @test numerator(y*z/x) == y*z
+    @test denominator(y*z/x) == x
+
+    @test numerator(x/(y*z)) == x
+    @test denominator(x/(y*z)) == y*z
+
+    @test numerator(1/-x) == 1
+    @test denominator(1/-x) == -x
+
+    @test numerator(1/sin(x)) == 1
+    @test denominator(1/sin(x)) == sin(x)
+
+    @test numerator(1/-sin(x)) == 1
+    @test denominator(1/-sin(x)) == -sin(x)
+
+    @test numerator(z/(-y*sin(x))) == z
+    @test denominator(z/(-y*sin(x))) == -y*sin(x)
 end

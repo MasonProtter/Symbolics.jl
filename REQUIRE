@@ -1,4 +1,5 @@
 julia 1.0
+AutoHashEquals v0.2.0
 Lazy v0.13.1
 LaTeXStrings v1.0.3
 DataStructures v0.14.0

@@ -2,36 +2,38 @@ Base.:(==)(x::A, y::B) where {A<:Symbolic,B<:Symbolic} = false
 Base.promote(x::A, y::B) where {A<:Symbolic,B<:Symbolic} =
     (SymExpr(:identity, [x]), SymExpr(:identity, [y]))
 
+# Thanks to Alex Arslan
+hasusermethod(func, ::Type{T}) where T =
+    hasmethod(func, Tuple{T,T}) &&
+    Base.tuple_type_tail(which(func, Tuple{T,T}).sig) == Tuple{T,T}
+
 """
-    @new_number NumberType (a::NumberType{T}, b::NumberType{U}) where {T,U} begin
-        # Implementation of a == b
-    end
+    @new_number NumberType
 
 Register a custom `NumberType<:Symbolic` as a number that can be used
 for symbolic manipulation. `@new_number` will define a few promotion
 rules as well as a comparison function between two objects of the type
-`NumberType`. The second argument to the macro, the type signature,
-need not be dependent on type parameters, but is possible to implement
-a comparison operator that considers the type parameters as well.
+`NumberType`, and a `Base.hash(::NumberType)`, if there are no
+pre-existing (user-defined) implementations. These default
+implementations will compare/hash `NumberType` field-by-field. If
+`NumberType` is parametrized and you need to dispatch the
+comparison/hash on the parameters, you have to define these functions
+before calling the `@new_number` macro.
 """
-macro new_number(type_name, comp_params, compare)
-    # Generate the method signature for Base.:(==)
-    Base_isequal = Expr(:call, Expr(Symbol("."), :Base, :(:(==))))
-    signature,args = if comp_params.head == :where
-        # Type parameters requested
-        Expr(:where, Base_isequal, comp_params.args[2:end]...),comp_params.args[1].args
-    else
-        # No type parameters
-        Base_isequal,comp_params.args
-    end
-    append!(Base_isequal.args, args)
-    # Associate the method signature with the actual implementation in
-    # `compare`.
-    def = Expr(:(=), signature, compare)
+macro new_number(type_name)
+    @isdefined(type_name) || error("No such type $(type_name)")
 
     quote
-        # Comparison with objects of the same type
-        $(esc(def))
+        local T = $(esc(type_name))
+        isstructtype(T) || error("$(type_name) does not designate a type")
+
+        local ftnames = fieldnames(T)
+
+        (hasusermethod(isequal, T) || hasusermethod(==, T)) ||
+            eval(AutoHashEquals.auto_equals($(esc(type_name)), ftnames))
+
+        hasusermethod(hash, T) ||
+            eval(AutoHashEquals.auto_hash($(esc(type_name)), ftnames))
 
         # Comparison with other number types are false by default
         Base.:(==)(x::$(esc(type_name)), y::N) where {N<:Union{Real,Complex}} = false

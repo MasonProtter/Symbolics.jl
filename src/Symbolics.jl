@@ -8,6 +8,7 @@ using Match
 using Lazy: @>
 using DataStructures
 using DiffRules, SpecialFunctions
+using AutoHashEquals
 
 
 include("types.jl")

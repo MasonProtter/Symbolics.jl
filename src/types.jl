@@ -56,10 +56,21 @@ end
 # This is only valid for numbers
 iscommutative(op) = op == Sym(:*) || op == Sym(:+)
 
+# We overload hash here since for commutative operators, we always
+# want to sort the argument hashes.
+function Base.hash(ex::SymExpr)
+    h = hash(ex.op)
+    ah = hash.(ex.args)
+    iscommutative(ex.op) && sort!(ah)
+    hash(ah, h)
+end
+
+ispermutation(u, v) = sort(hash.(u)) == sort(hash.(v))
+
 function Base.:(==)(x::AbstractSymExpr,y::AbstractSymExpr)
     (x.op == y.op) && (length(x.args) == length(y.args)) &&
         (all(isequal.(x.args,y.args)) ||
-         iscommutative(x.op) && all(a in y.args for a in x.args))
+         iscommutative(x.op) && ispermutation(x.args, y.args))
 end
 
 Base.:(==)(x::AbstractSymExpr, y) = false

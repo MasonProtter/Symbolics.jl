@@ -7,7 +7,7 @@ My intention with Symbolics.jl is to attempt to recreate the functionality of sc
 
 This package works on Julia 1.0. To add it, simply
 ```
-pkg> add git@github.com:MasonProtter/Symbolics.jl.git
+pkg> add https://github.com/MasonProtter/Symbolics.jl
 ```
 
 Note: This package is very much a work in progress! Don't rely on it for *anything* important. 

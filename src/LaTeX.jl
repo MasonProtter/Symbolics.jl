@@ -233,6 +233,28 @@ function latex(expr::SymExpr)
     end
 end
 
+# **nothing
+latex(::Nothing) = "",0
+
+# **matrices
+function latex(A::AbstractMatrix)
+    ret = "\\begin{pmatrix}\n"
+    for k = 1:size(A,1)-1
+        for j = 1:size(A,2)-1
+            ret *= latex(A[k,j])[1] * " & "
+        end
+        ret *= latex(A[k,end])[1] * " \\\\\n"
+    end
+    for j = 1:size(A,2)-1
+        ret *= latex(A[end,j])[1] * " & "
+    end
+    ret *= latex(A[end,end])[1]
+    ret *= "\n\\end{pmatrix}"
+
+    ret, 0
+end
+
+
 # * Convert to LaTeXString, display
 
 Base.convert(::Type{LaTeXString}, s::S) where {S<:Symbolic} =

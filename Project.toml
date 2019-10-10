@@ -1,0 +1,11 @@
+name = "Symbolics"
+uuid = "32b5631f-446d-4d66-bb6b-761ad118b463"
+authors = ["MasonProtter <mason.protter@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+ChainRules = "082447d4-558c-5d27-93f4-14fc19e9eca2"
+Espresso = "6912e4f1-e036-58b0-9138-08d1e6358ea9"
+MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+Rematch = "bfecab0d-fd4d-5014-a23f-56c5fae6447a"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"

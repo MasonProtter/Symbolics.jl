@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.com/MasonProtter/Symbolics.jl.svg?branch=master)](https://travis-ci.com/MasonProtter/Symbolics.jl) [![Build status](https://ci.appveyor.com/api/projects/status/dmthyx5hr6udact2/branch/master?svg=true)](https://ci.appveyor.com/project/MasonProtter/symbolics-jl/branch/master) [![codecov](https://codecov.io/gh/MasonProtter/Symbolics.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/MasonProtter/Symbolics.jl)
 # Symbolics.jl
 
+### Symbolics.jl has moved to https://github.com/JuliaSymbolics/Symbolics.jl
+
 This is a package I'm throwing together after getting inspired by the talk [Physics in Clojure](https://www.youtube.com/watch?v=7PoajCqNKpg) which was about porting scmutils to clojure. scmutils is a Scheme package with a very interesting and powerful computer algebra system meant as a companion to the book [Structure and Interpretation of Classical Mechanics](https://mitpress.mit.edu/books/structure-and-interpretation-classical-mechanics-second-edition).
 
 My intention with Symbolics.jl is to attempt to recreate the functionality of scmutils in julia using julian syntax. The package is slowly morphing into some sort of hybrid between scmutils and Mathematica.
